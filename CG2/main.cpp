@@ -388,9 +388,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pipelineDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;	//標準設定
 
 	//ラスタライザの設定
-	pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;	//カリングしない
-	pipelineDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;	//ポリゴン内塗りつぶし
-	pipelineDesc.RasterizerState.DepthClipEnable = true;			//深度クリッピングを有効に
+	pipelineDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;		//カリングしない
+	pipelineDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;		//ポリゴン内塗りつぶし
+	//pipelineDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;	//ワイヤーフレーム表示
+	pipelineDesc.RasterizerState.DepthClipEnable = true;				//深度クリッピングを有効に
 
 	//ブレンドステート
 	pipelineDesc.BlendState.RenderTarget[0].RenderTargetWriteMask
@@ -504,6 +505,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		viewport.TopLeftY = 0;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
+
 		//ビューポート設定コマンドを、コマンドリストに積む
 		commandList->RSSetViewports(1, &viewport);
 
