@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region//ウィンドウの生成
 	//ウィンドウサイズ
-	const int window_width = 1200;
+	const int window_width = 1280;
 	const int window_height = 720;
 
 	//ウィンドウクラスの設定
@@ -499,9 +499,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 //ビューポート設定のコマンド
 		D3D12_VIEWPORT viewport{};
-		viewport.Width = window_width - 0;		//横幅
+		viewport.Width = window_width /2;		//横幅
 		viewport.Height = window_height - 0;	//縦幅
-		viewport.TopLeftX = 0;					//左上X
+		viewport.TopLeftX = window_width / 2;					//左上X
 		viewport.TopLeftY = 0;					//左上Y
 		viewport.MinDepth = 0.0f;				//最小深度
 		viewport.MaxDepth = 1.0f;				//最大深度
@@ -513,7 +513,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		D3D12_RECT scissorRect{};
 		scissorRect.left = 0;									//切り抜き座標左
 		scissorRect.right = scissorRect.left + window_width;	//切り抜き座標右
-		scissorRect.top = 0;									//切り抜き座標上
+		scissorRect.top = window_height/2;									//切り抜き座標上
 		scissorRect.bottom = scissorRect.top + window_height;	//切り抜き座標下
 
 		//シザー矩形コマンドを、コマンドリストに積む
