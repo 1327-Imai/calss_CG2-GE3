@@ -10,6 +10,7 @@
 #define DIRECTINPUT_VERSION 0x0800	//DirectInoutのバージョン指定
 #include <dinput.h>
 
+#include <math.h>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -18,6 +19,8 @@
 #pragma comment(lib,"dxguid.lib")
 
 using namespace DirectX;
+
+const double PI = 3.141592;
 
 #pragma region//関数のプロトタイプ宣言
 //ウィンドウプロシーシャ
@@ -248,19 +251,31 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 #pragma endregion//DirectX初期化処理
 
+#pragma region//更新処理用変数
+
+#pragma endregion//更新処理用変数
+
 #pragma region//描画初期化処理
 
+	//頂点データ
 	XMFLOAT3 vertices[] = {
-		{-0.5f , -0.5f , 0.0f} , //左下
-		{-0.5f , +0.5f , 0.0f} , //左上
-		{+0.5f , -0.5f , 0.0f} , //右下
-		{+0.5f , -0.5f , 0.0f} , //右下
-		{-0.5f , +0.5f , 0.0f} , //左上
-		{+0.5f , +0.5f , 0.0f} , //右上
+		{-0.5f , -0.5f , 0.0f} , //左下 インデックス0
+		{-0.5f , +0.5f , 0.0f} , //左上 インデックス1
+		{+0.5f , -0.5f , 0.0f} , //右下 インデックス2
+		{+0.5f , +0.5f , 0.0f} , //右上 インデックス3
+	};
+
+	//インデックスデータ
+	uint16_t indices[] = {
+		0 , 1 , 2 , //三角形1つ目
+		1 , 2 , 3 , //三角形2つ目
 	};
 
 	//頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
+
+	//インデックスデータ全体のサイズ
+	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * _countof(indices));
 
 	//頂点バッファの設定
 	D3D12_HEAP_PROPERTIES heapProp{};		//ヒープ設定
@@ -269,14 +284,14 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//リソース設定
 	D3D12_RESOURCE_DESC resDesc{};
 	resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resDesc.Width = sizeVB; //頂点データ全体のサイズ
+	resDesc.Width = sizeIB; //頂点データ全体のサイズ
 	resDesc.Height = 1;
 	resDesc.DepthOrArraySize = 1;
 	resDesc.MipLevels = 1;
 	resDesc.SampleDesc.Count = 1;
 	resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	//頂点バッファの設定
+	//頂点バッファの生成
 	ID3D12Resource* vertBuff = nullptr;
 	result = device->CreateCommittedResource(
 		&heapProp ,	//ヒープ設定
@@ -285,6 +300,18 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		D3D12_RESOURCE_STATE_GENERIC_READ ,
 		nullptr ,
 		IID_PPV_ARGS(&vertBuff)
+	);
+	assert(SUCCEEDED(result));
+
+	//インデックスバッファの生成
+	ID3D12Resource* indexBuff = nullptr;
+	result = device->CreateCommittedResource(
+		&heapProp ,	//ヒープ設定
+		D3D12_HEAP_FLAG_NONE ,
+		&resDesc ,	//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ ,
+		nullptr ,
+		IID_PPV_ARGS(&indexBuff)
 	);
 	assert(SUCCEEDED(result));
 
@@ -298,14 +325,30 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//繋がりを解除
 	vertBuff->Unmap(0 , nullptr);
 
-	// 頂点バッファビューの作成
+	//インデックスバッファをマッピング
+	uint16_t* indexMap = nullptr;
+	result = indexBuff->Map(0 , nullptr , (void**)&indexMap);
+	//全インデックスに対して
+	for (int i = 0; i < _countof(indices); i++) {
+		indexMap[i] = indices[i];	//座標をコピー
+	}
+	//繋がりを解除
+	indexBuff->Unmap(0 , nullptr);
+
+	//頂点バッファビューの作成
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
-	// GPU仮想アドレス
+	//GPU仮想アドレス
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-	// 頂点バッファのサイズ
+	//頂点バッファのサイズ
 	vbView.SizeInBytes = sizeVB;
-	// 頂点１つ分のデータサイズ
+	//頂点１つ分のデータサイズ
 	vbView.StrideInBytes = sizeof(XMFLOAT3);
+	
+	//インデックスバッファビューの作成
+	D3D12_INDEX_BUFFER_VIEW ibView{};
+	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R16_UINT;
+	ibView.SizeInBytes = sizeIB;
 
 	//頂点シェーダーファイルの読み込みとコンパイル
 	ID3DBlob* vsBlob = nullptr;		//頂点シェーダーオブジェクト
@@ -317,7 +360,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		L"BasicVS.hlsl" ,									//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
-		"main" ,												//エントリーポイント名
+		"main" ,											//エントリーポイント名
 		"vs_5_0" ,											//シェーダーモデル指定
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION ,	//デバッグ用設定
 		0 ,
@@ -532,7 +575,12 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		BYTE key[256] = {};
 		keyboard->GetDeviceState(sizeof(key) , key);
 
-		// バックバッファの番号を取得（2つなので0番か1番）
+#pragma region//更新処理
+
+#pragma endregion//更新処理
+
+#pragma region//描画処理
+		//バックバッファの番号を取得（2つなので0番か1番）
 		UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
 
 		//1.リソースバリアで書き込み可能に変更
@@ -592,16 +640,19 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		commandList->SetGraphicsRootSignature(rootSignature);
 
 		//プリミティブ形状の設定コマンド
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);	//三角形リスト
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		//頂点バッファビューの設定コマンド
 		commandList->IASetVertexBuffers(0 , 1 , &vbView);
+
+		//インデックスバッファビューの設定コマンド
+		commandList->IASetIndexBuffer(&ibView);
 
 		//頂点バッファ―ビューをセットするコマンド
 		commandList->SetGraphicsRootConstantBufferView(0 , constBuffMaterial->GetGPUVirtualAddress());
 
 		//描画コマンド
-		commandList->DrawInstanced(_countof(vertices) , 1 , 0 , 0);	//全ての頂点を使って描画
+		commandList->DrawInstanced(_countof(indices) , 1 , 0 , 0);	//全ての頂点を使って描画
 
 #pragma endregion//グラフィックコマンド
 
@@ -636,6 +687,8 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		//再びコマンドリストをためる準備
 		result = commandList->Reset(cmdAllocator , nullptr);
 		assert(SUCCEEDED(result));
+#pragma endregion//描画処理
+
 #pragma endregion//DirectX毎フレーム処理
 
 	}
