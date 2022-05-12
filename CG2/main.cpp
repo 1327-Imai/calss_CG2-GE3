@@ -251,10 +251,6 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 #pragma endregion//DirectX初期化処理
 
-#pragma region//更新処理用変数
-
-#pragma endregion//更新処理用変数
-
 #pragma region//描画初期化処理
 
 	//頂点データ
@@ -574,10 +570,6 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		//前キーの入力状態を取得する
 		BYTE key[256] = {};
 		keyboard->GetDeviceState(sizeof(key) , key);
-
-#pragma region//更新処理
-
-#pragma endregion//更新処理
 
 #pragma region//描画処理
 		//バックバッファの番号を取得（2つなので0番か1番）
