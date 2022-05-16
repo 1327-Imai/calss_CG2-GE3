@@ -632,7 +632,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		commandList->SetGraphicsRootSignature(rootSignature);
 
 		//プリミティブ形状の設定コマンド
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		//頂点バッファビューの設定コマンド
 		commandList->IASetVertexBuffers(0 , 1 , &vbView);
@@ -644,7 +644,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		commandList->SetGraphicsRootConstantBufferView(0 , constBuffMaterial->GetGPUVirtualAddress());
 
 		//描画コマンド
-		commandList->DrawInstanced(_countof(indices) , 1 , 0 , 0);	//全ての頂点を使って描画
+		commandList->DrawIndexedInstanced(_countof(indices) , 1 , 0 , 0 , 0);	//全ての頂点を使って描画
 
 #pragma endregion//グラフィックコマンド
 
