@@ -253,12 +253,17 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 #pragma region//描画初期化処理
 
+	struct Vertex {
+		XMFLOAT3 pos;	//xyz座標
+		XMFLOAT2 uv;	//uv座標
+	};
+
 	//頂点データ
-	XMFLOAT3 vertices[] = {
-		{-0.5f , -0.5f , 0.0f} , //左下 インデックス0
-		{-0.5f , +0.5f , 0.0f} , //左上 インデックス1
-		{+0.5f , -0.5f , 0.0f} , //右下 インデックス2
-		{+0.5f , +0.5f , 0.0f} , //右上 インデックス3
+	Vertex vertices[] = {
+		{ {-0.4f , -0.7f , 0.0f} , {0.0f,1.0f}},//左下 インデックス0
+		{ {-0.4f , +0.7f , 0.0f} , {0.0f,0.0f}},//左上 インデックス1
+		{ {+0.4f , -0.7f , 0.0f} , {1.0f,1.0f}},//右下 インデックス2
+		{ {+0.4f , +0.7f , 0.0f} , {1.0f,0.0f}},//右上 インデックス3
 	};
 
 	//インデックスデータ
@@ -268,7 +273,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	};
 
 	//頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
-	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
+	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * _countof(vertices));
 
 	//インデックスデータ全体のサイズ
 	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * _countof(indices));
@@ -312,7 +317,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	assert(SUCCEEDED(result));
 
 	//GPU上のバッファに対応した仮想メモリ(メインメモリ上)を取得
-	XMFLOAT3* vertMap = nullptr;
+	Vertex* vertMap = nullptr;
 	result = vertBuff->Map(0 , nullptr , (void**)&vertMap);
 	//全頂点に対して
 	for (int i = 0; i < _countof(vertices); i++) {
@@ -338,8 +343,8 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//頂点バッファのサイズ
 	vbView.SizeInBytes = sizeVB;
 	//頂点１つ分のデータサイズ
-	vbView.StrideInBytes = sizeof(XMFLOAT3);
-	
+	vbView.StrideInBytes = sizeof(vertices[0]);
+
 	//インデックスバッファビューの作成
 	D3D12_INDEX_BUFFER_VIEW ibView{};
 	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
@@ -411,11 +416,16 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 	//頂点レイアウト
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-		{
+		{//xyz座標
 			"POSITION" , 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
+		{//uv座標
+			"TEXCODE",0,DXGI_FORMAT_R32G32_FLOAT,0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0
+		},
 	};
 
 	//グラフィックスパイプライン設定
