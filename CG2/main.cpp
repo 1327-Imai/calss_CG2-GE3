@@ -37,8 +37,8 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 #pragma region//ウィンドウの生成
 	//ウィンドウサイズ
-	const int window_width = 1280;
-	const int window_height = 720;
+	const int WINDOW_WIDTH = 1280;
+	const int WINDOW_HEIGHT = 720;
 
 	//ウィンドウクラスの設定
 	WNDCLASSEX w{};
@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//ウィンドウクラスをOSに登録する
 	RegisterClassEx(&w);
 	//ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
-	RECT wrc = {0 , 0 , window_width , window_height};
+	RECT wrc = {0 , 0 , WINDOW_WIDTH , WINDOW_HEIGHT};
 	//自動でサイズを補正する
 	AdjustWindowRect(&wrc , WS_OVERLAPPEDWINDOW , false);
 
@@ -261,10 +261,10 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 	//頂点データ
 	Vertex vertices[] = {
-		{ {-0.4f , -0.7f , 0.0f} , {0.0f,1.0f}},//左下 インデックス0
-		{ {-0.4f , +0.7f , 0.0f} , {0.0f,0.0f}},//左上 インデックス1
-		{ {+0.4f , -0.7f , 0.0f} , {1.0f,1.0f}},//右下 インデックス2
-		{ {+0.4f , +0.7f , 0.0f} , {1.0f,0.0f}},//右上 インデックス3
+		{{000.0f,	100.0f ,	000.0f} , {0.0f , 1.0f}} ,//左下 インデックス0
+		{{000.0f,	000.0f ,	000.0f} , {0.0f , 0.0f}} ,//左上 インデックス1
+		{{100.0f,	100.0f ,	000.0f} , {1.0f , 1.0f}} ,//右下 インデックス2
+		{{100.0f,	000.0f ,	000.0f} , {1.0f , 0.0f}} ,//右上 インデックス3
 	};
 
 	//インデックスデータ
@@ -423,10 +423,10 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
 		{//uv座標
-			"TEXCODE",0,DXGI_FORMAT_R32G32_FLOAT,0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0
-		},
+			"TEXCODE" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
+			D3D12_APPEND_ALIGNED_ELEMENT ,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
+		} ,
 	};
 
 	//グラフィックスパイプライン設定
@@ -487,7 +487,7 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 	//ルートパラメータ
 	//ルートパラメータの設定
-	D3D12_ROOT_PARAMETER rootParams[2] = {};
+	D3D12_ROOT_PARAMETER rootParams[3] = {};
 	//定数バッファ0番
 	rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//定数バッファビュー
 	rootParams[0].Descriptor.ShaderRegister = 0;					//定数バッファ番号
@@ -498,6 +498,11 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	rootParams[1].DescriptorTable.pDescriptorRanges = &descriptorRange;			//デスクリプタレンジ
 	rootParams[1].DescriptorTable.NumDescriptorRanges = 1;						//デスクリプタレンジ数
 	rootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;				//全てのシェーダーから見える
+	//定数バッファ1番
+	rootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//定数バッファビュー
+	rootParams[2].Descriptor.ShaderRegister = 1;					//定数バッファ番号
+	rootParams[2].Descriptor.RegisterSpace = 0;						//デフォルト値
+	rootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;	//全てのシェーダーから見える
 
 	//テクスチャサンプラーの設定
 	D3D12_STATIC_SAMPLER_DESC samplerDesc{};
@@ -582,8 +587,55 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//値を書き込むと自動的に転送される
 	constMapMaterial->color = XMFLOAT4(1.0f , 0.0f , 0.0f , 0.5f);
 
+	//定数バッファ用データ構造体(3D変換行列)
+	struct ConstBufferDataTransform {
+		XMMATRIX mat; //3D変換行列
+	};
+
+	//定数バッファの生成
+	{
+		//ヒープ設定
+		D3D12_HEAP_PROPERTIES cbHeapProp{};
+		cbHeapProp.Type = D3D12_HEAP_TYPE_UPLOAD;	//GPUへの転送用
+
+		//リソース設定
+		D3D12_RESOURCE_DESC cbResourceDesc{};
+		cbResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		cbResourceDesc.Width = (sizeof(ConstBufferDataTransform) + 0xff) & ~0xff;	//256バイトアラインメント
+		cbResourceDesc.Height = 1;
+		cbResourceDesc.DepthOrArraySize = 1;
+		cbResourceDesc.MipLevels = 1;
+		cbResourceDesc.SampleDesc.Count = 1;
+		cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	}
+
+	ID3D12Resource* constBuffTransform = nullptr;
+	//定数バッファの生成
+	result = device->CreateCommittedResource(
+		&cbHeapProp ,	//ヒープ設定
+		D3D12_HEAP_FLAG_NONE ,
+		&cbResourceDesc ,	//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ ,
+		nullptr ,
+		IID_PPV_ARGS(&constBuffTransform)
+	);
+	assert(SUCCEEDED(result));
+
+	//定数バッファのマッピング
+	ConstBufferDataTransform* constMapTransform = nullptr;
+	result = constBuffTransform->Map(0 , nullptr , (void**)&constMapTransform); // マッピング
+	assert(SUCCEEDED(result));
+
+	//単位行列を代入
+	constMapTransform->mat = XMMatrixIdentity();
+
+	//2D座標系に変換
+	constMapTransform->mat.r[0].m128_f32[0] = 2.0f / WINDOW_WIDTH;
+	constMapTransform->mat.r[1].m128_f32[1] = -2.0f / WINDOW_HEIGHT;
+	constMapTransform->mat.r[3].m128_f32[0] = -1.0;
+	constMapTransform->mat.r[3].m128_f32[1] = 1.0;
+
 	//画像イメージデータの作成
-	
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 	//WICテクスチャのロード
@@ -610,25 +662,6 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	}
 	//読み込んだディフューズテクスチャをSRGBとして扱う
 	metadata.format = MakeSRGB(metadata.format);
-
-	////横方向ピクセル数
-	//const size_t textureWidth = 256;
-	////縦方向ピクセル数
-	//const size_t textuerHeight = 256;
-	////配列の要素数
-	//const size_t imageDataCount = textureWidth * textuerHeight;
-	////画像イメージデータ配列
-	//XMFLOAT4* imageData = new XMFLOAT4[imageDataCount];//※必ず後で解放する
-
-	////全てのピクセルの色を初期化
-	//for (size_t i = 0; i < imageDataCount; i++) {
-	//	
-	//	imageData[i].x = 1.0f;	//R
-	//	imageData[i].y = 0.0f;	//G
-	//	imageData[i].z = 0.0f;	//B
-	//	imageData[i].w = 1.0f;	//A
-
-	//}
 
 	//ヒープ設定
 	D3D12_HEAP_PROPERTIES textureHeapProp{};
@@ -767,8 +800,8 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 		//ビューポート設定のコマンド
 		D3D12_VIEWPORT viewport{};
-		viewport.Width = window_width;		//横幅
-		viewport.Height = window_height - 0;	//縦幅
+		viewport.Width = WINDOW_WIDTH;		//横幅
+		viewport.Height = WINDOW_HEIGHT - 0;	//縦幅
 		viewport.TopLeftX = 0;	//左上X
 		viewport.TopLeftY = 0;					//左上Y
 		viewport.MinDepth = 0.0f;				//最小深度
@@ -780,9 +813,9 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		//シザー矩形
 		D3D12_RECT scissorRect{};
 		scissorRect.left = 0;									//切り抜き座標左
-		scissorRect.right = scissorRect.left + window_width;	//切り抜き座標右
+		scissorRect.right = scissorRect.left + WINDOW_WIDTH;	//切り抜き座標右
 		scissorRect.top = 0;									//切り抜き座標上
-		scissorRect.bottom = scissorRect.top + window_height;	//切り抜き座標下
+		scissorRect.bottom = scissorRect.top + WINDOW_HEIGHT;	//切り抜き座標下
 
 		//シザー矩形コマンドを、コマンドリストに積む
 		commandList->RSSetScissorRects(1 , &scissorRect);
@@ -811,6 +844,9 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 		//SRVヒープの先頭にあるSRVをルートパラメータ1番に設定
 		commandList->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
+
+		//定数バッファビュー(CBV)の設定コマンド
+		commandList->SetGraphicsRootConstantBufferView(2 , constBuffTransform->GetGPUVirtualAddress());
 
 		//描画コマンド
 		commandList->DrawIndexedInstanced(_countof(indices) , 1 , 0 , 0 , 0);	//全ての頂点を使って描画
