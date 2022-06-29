@@ -261,10 +261,10 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 	//頂点データ
 	Vertex vertices[] = {
-		{{000.0f,	100.0f ,	000.0f} , {0.0f , 1.0f}} ,//左下 インデックス0
-		{{000.0f,	000.0f ,	000.0f} , {0.0f , 0.0f}} ,//左上 インデックス1
-		{{100.0f,	100.0f ,	000.0f} , {1.0f , 1.0f}} ,//右下 インデックス2
-		{{100.0f,	000.0f ,	000.0f} , {1.0f , 0.0f}} ,//右上 インデックス3
+		{{-50.0f,	-50.0f ,	50.0f} , {0.0f , 1.0f}} ,//左下 インデックス0
+		{{-50.0f,	 50.0f ,	50.0f} , {0.0f , 0.0f}} ,//左上 インデックス1
+		{{ 50.0f,	-50.0f ,	50.0f} , {1.0f , 1.0f}} ,//右下 インデックス2
+		{{ 50.0f,	 50.0f ,	50.0f} , {1.0f , 0.0f}} ,//右上 インデックス3
 	};
 
 	//インデックスデータ
@@ -629,11 +629,23 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//単位行列を代入
 	constMapTransform->mat = XMMatrixIdentity();
 
-	//2D座標系に変換
-	constMapTransform->mat.r[0].m128_f32[0] = 2.0f / WINDOW_WIDTH;
-	constMapTransform->mat.r[1].m128_f32[1] = -2.0f / WINDOW_HEIGHT;
-	constMapTransform->mat.r[3].m128_f32[0] = -1.0;
-	constMapTransform->mat.r[3].m128_f32[1] = 1.0;
+	////平行投影変換行列の計算
+	//constMapTransform->mat = XMMatrixOrthographicOffCenterLH(
+	//	0.0f , WINDOW_WIDTH ,
+	//	WINDOW_HEIGHT , 0.0f ,
+	//	0.0f , 1.0f
+	//);
+
+	//透視投影変換行列の計算
+	XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
+		XMConvertToRadians(45.0) ,
+		(float)WINDOW_WIDTH/WINDOW_HEIGHT,
+		0.1f , 1000.0f
+	);
+
+
+	//定数バッファに転送
+	constMapTransform->mat = matProjection;
 
 	//画像イメージデータの作成
 	TexMetadata metadata{};
