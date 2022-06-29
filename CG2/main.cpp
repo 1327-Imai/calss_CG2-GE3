@@ -261,10 +261,10 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 
 	//頂点データ
 	Vertex vertices[] = {
-		{{-50.0f,	-50.0f ,	50.0f} , {0.0f , 1.0f}} ,//左下 インデックス0
-		{{-50.0f,	 50.0f ,	50.0f} , {0.0f , 0.0f}} ,//左上 インデックス1
-		{{ 50.0f,	-50.0f ,	50.0f} , {1.0f , 1.0f}} ,//右下 インデックス2
-		{{ 50.0f,	 50.0f ,	50.0f} , {1.0f , 0.0f}} ,//右上 インデックス3
+		{{-25.0f , -25.0f , 0.0f} , {0.0f , 1.0f}} ,//左下 インデックス0
+		{{-25.0f , 25.0f , 0.0f} , {0.0f , 0.0f}} ,//左上 インデックス1
+		{{25.0f , -25.0f , 0.0f} , {1.0f , 1.0f}} ,//右下 インデックス2
+		{{25.0f , 25.0f , 0.0f} , {1.0f , 0.0f}} ,//右上 インデックス3
 	};
 
 	//インデックスデータ
@@ -639,13 +639,21 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 	//透視投影変換行列の計算
 	XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(45.0) ,
-		(float)WINDOW_WIDTH/WINDOW_HEIGHT,
+		(float)WINDOW_WIDTH / WINDOW_HEIGHT ,
 		0.1f , 1000.0f
 	);
 
+	//ビュー変換行列
+	XMMATRIX matView;
+	XMFLOAT3 eye(0 , 30 , -100);	//視点座標
+	XMFLOAT3 target(0 , 0 , 0);	//注視点座標
+	XMFLOAT3 up(0 , 1 , 0);		//上方向ベクトル
+	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye) , XMLoadFloat3(&target) , XMLoadFloat3(&up));
+
+	float angle = 0.0f;
 
 	//定数バッファに転送
-	constMapTransform->mat = matProjection;
+	constMapTransform->mat = matView * matProjection;
 
 	//画像イメージデータの作成
 	TexMetadata metadata{};
@@ -775,6 +783,30 @@ int WINAPI WinMain(HINSTANCE , HINSTANCE , LPSTR , int) {
 		//前キーの入力状態を取得する
 		BYTE key[256] = {};
 		keyboard->GetDeviceState(sizeof(key) , key);
+
+#pragma region//更新処理
+
+		if (key[DIK_D] || key[DIK_A]) {
+
+			if (key[DIK_D]) {
+				angle += XMConvertToRadians(1.0f);
+			}
+			if (key[DIK_A]) {
+				angle -= XMConvertToRadians(1.0f);
+			}
+
+			//angleラジアンだけY軸周りに回転。半径は-100
+			eye.x = -100 * sinf(angle);
+			eye.z = -100 * cosf(angle);
+
+			//ビュー変換行列を作り直す
+			matView = XMMatrixLookAtLH(XMLoadFloat3(&eye) , XMLoadFloat3(&target) , XMLoadFloat3(&up));
+
+		}
+		//定数バッファに転送
+		constMapTransform->mat = matView * matProjection;
+
+#pragma endregion//更新処理
 
 #pragma region//描画処理
 		//バックバッファの番号を取得（2つなので0番か1番）
