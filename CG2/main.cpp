@@ -338,7 +338,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 	struct Vertex {
 		XMFLOAT3 pos;	//xyz座標
-		XMFLOAT3 nomal;	//法線ベクトル
+		XMFLOAT3 normal;	//法線ベクトル
 		XMFLOAT2 uv;	//uv座標
 	};
 
@@ -398,6 +398,37 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		20 , 21 , 22 ,
 		21 , 23 , 22 ,
 	};
+
+	//法線の計算
+	for (int i = 0; i < _countof(indices) / 3; i++) {
+
+		//三角形のインデックスを取り出して一時的な変数に入れる
+		unsigned short index0 = indices[i * 3 + 0];
+		unsigned short index1 = indices[i * 3 + 1];
+		unsigned short index2 = indices[i * 3 + 2];
+
+		//三角形を構成する頂点座標をベクトルに代入
+		XMVECTOR p0 = XMLoadFloat3(&vertices[index0].pos);
+		XMVECTOR p1 = XMLoadFloat3(&vertices[index1].pos);
+		XMVECTOR p2 = XMLoadFloat3(&vertices[index2].pos);
+
+		//p0→p1ベクトル、p0→p2ベクトルを計算(ベクトルの減算)
+		XMVECTOR v1 = XMVectorSubtract(p1 , p0);
+		XMVECTOR v2 = XMVectorSubtract(p2 , p0);
+
+		//外積は両方から垂直なベクトル
+		XMVECTOR normal = XMVector3Cross(v1 , v2);
+
+		//正規化
+		normal = XMVector3Normalize(normal);
+
+		//求めた法線を頂点データに代入
+		XMStoreFloat3(&vertices[index0].normal , normal);
+		XMStoreFloat3(&vertices[index1].normal , normal);
+		XMStoreFloat3(&vertices[index2].normal , normal);
+
+	}
+
 
 	//頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
 	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * _countof(vertices));
@@ -555,7 +586,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
 		{//法線ベクトル
-			"NOMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
+			"NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
@@ -738,7 +769,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 	//定数バッファへのデータ転送
 	//値を書き込むと自動的に転送される
-	constMapMaterial->color = XMFLOAT4(1.0f , 0.0f , 0.0f , 0.5f);
+	constMapMaterial->color = XMFLOAT4(1.0f , 1.0f , 1.0f , 0.5f);
 
 	//定数バッファ用データ構造体(3D変換行列)
 	struct ConstBufferDataTransform {
