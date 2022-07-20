@@ -586,7 +586,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
 		{//法線ベクトル
-			"NORMAL", 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
+			"NORMAL" , 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
@@ -793,7 +793,8 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	}
 
-	ComPtr<ID3D12Resource> constBuffTransform = nullptr;
+	//0番の行列用定数バッファを生成
+	ComPtr<ID3D12Resource> constBuffTransform0 = nullptr;
 	//定数バッファの生成
 	result = device->CreateCommittedResource(
 		&cbHeapProp ,	//ヒープ設定
@@ -801,19 +802,37 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		&cbResourceDesc ,	//リソース設定
 		D3D12_RESOURCE_STATE_GENERIC_READ ,
 		nullptr ,
-		IID_PPV_ARGS(&constBuffTransform)
+		IID_PPV_ARGS(&constBuffTransform0)
 	);
 	assert(SUCCEEDED(result));
 
 	//定数バッファのマッピング
-	ConstBufferDataTransform* constMapTransform = nullptr;
-	result = constBuffTransform->Map(0 , nullptr , (void**)&constMapTransform); // マッピング
+	ConstBufferDataTransform* constMapTransform0 = nullptr;
+	result = constBuffTransform0->Map(0 , nullptr , (void**)&constMapTransform0); // マッピング
+	assert(SUCCEEDED(result));
+
+	//1番の行列用定数バッファを生成
+	ComPtr<ID3D12Resource> constBuffTransform1 = nullptr;
+	//定数バッファの生成
+	result = device->CreateCommittedResource(
+		&cbHeapProp ,	//ヒープ設定
+		D3D12_HEAP_FLAG_NONE ,
+		&cbResourceDesc ,	//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ ,
+		nullptr ,
+		IID_PPV_ARGS(&constBuffTransform1)
+	);
+	assert(SUCCEEDED(result));
+
+	//定数バッファのマッピング
+	ConstBufferDataTransform* constMapTransform1 = nullptr;
+	result = constBuffTransform1->Map(0 , nullptr , (void**)&constMapTransform1); // マッピング
 	assert(SUCCEEDED(result));
 #pragma endregion
 
 #pragma region//射影変換
 	//単位行列を代入
-	constMapTransform->mat = XMMatrixIdentity();
+	constMapTransform0->mat = XMMatrixIdentity();
 
 	////平行投影変換行列の計算
 	//constMapTransform->mat = XMMatrixOrthographicOffCenterLH(
@@ -862,9 +881,26 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 	matTrans = XMMatrixTranslation(position.x , position.y , position.z);
 	matWorld *= matTrans;	//ワールド行列に平行移動行列を反映
 
+	//ワールド変換行列
+	XMMATRIX matWorld1;
+	matWorld1 = XMMatrixIdentity();
+
+	XMMATRIX matScale1;	//スケーリング行列
+	matScale1 = XMMatrixScaling(1 , 1 , 1);
+	matWorld1 *= matScale1;	//ワールド行列にスケーリングを反映
+
+	XMMATRIX matRot1;	//回転行列
+	matRot1 = XMMatrixIdentity();
+	matRot1 *= XMMatrixRotationY(XMConvertToRadians(45.0f));
+	matWorld1 *= matRot1;	//ワールド行列に回転を反映
+
+	XMMATRIX matTrans1;	//平行移動行列
+	matTrans1 = XMMatrixTranslation(-20.0f , 0 , 0);
+	matWorld1 *= matTrans1;	//ワールド行列に平行移動行列を反映
+
 
 	//ワールド、ビュー、プロジェクションを合成して定数バッファに転送
-	constMapTransform->mat = matWorld * matView * matProjection;
+	constMapTransform1->mat = matWorld1 * matView * matProjection;
 #pragma endregion
 
 #pragma region//テクスチャ
@@ -1119,7 +1155,8 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 
 		//ワールド、ビュー、プロジェクションを合成して定数バッファに転送
-		constMapTransform->mat = matWorld * matView * matProjection;
+		constMapTransform0->mat = matWorld * matView * matProjection;
+		constMapTransform1->mat = matWorld1 * matView * matProjection;
 
 #pragma endregion//更新処理
 
@@ -1207,7 +1244,13 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		commandList->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
 
 		//定数バッファビュー(CBV)の設定コマンド
-		commandList->SetGraphicsRootConstantBufferView(2 , constBuffTransform->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(2 , constBuffTransform0->GetGPUVirtualAddress());
+
+		//描画コマンド
+		commandList->DrawIndexedInstanced(_countof(indices) , 1 , 0 , 0 , 0);	//全ての頂点を使って描画
+
+		//定数バッファビュー(CBV)の設定コマンド
+		commandList->SetGraphicsRootConstantBufferView(2 , constBuffTransform1->GetGPUVirtualAddress());
 
 		//描画コマンド
 		commandList->DrawIndexedInstanced(_countof(indices) , 1 , 0 , 0 , 0);	//全ての頂点を使って描画
