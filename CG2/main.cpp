@@ -500,7 +500,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 	//リソース設定
 	D3D12_RESOURCE_DESC resDesc{};
 	resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resDesc.Width = sizeIB; //頂点データ全体のサイズ
+	resDesc.Width = sizeVB; //頂点データ全体のサイズ
 	resDesc.Height = 1;
 	resDesc.DepthOrArraySize = 1;
 	resDesc.MipLevels = 1;
@@ -976,7 +976,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 	textureResouceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	textureResouceDesc.Format = metadata.format;
 	textureResouceDesc.Width = metadata.width;	//幅
-	textureResouceDesc.Height = metadata.height;	//高さ
+	textureResouceDesc.Height = (UINT)metadata.height;	//高さ
 	textureResouceDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
 	textureResouceDesc.MipLevels = (UINT16)metadata.mipLevels;
 	textureResouceDesc.SampleDesc.Count = 1;
@@ -986,7 +986,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 	textureResouceDesc2.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	textureResouceDesc2.Format = metadata2.format;
 	textureResouceDesc2.Width = metadata2.width;	//幅
-	textureResouceDesc2.Height = metadata2.height;	//高さ
+	textureResouceDesc2.Height = (UINT)metadata2.height;	//高さ
 	textureResouceDesc2.DepthOrArraySize = (UINT16)metadata2.arraySize;
 	textureResouceDesc2.MipLevels = (UINT16)metadata2.mipLevels;
 	textureResouceDesc2.SampleDesc.Count = 1;
@@ -1060,7 +1060,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 	srvHeapDesc.NumDescriptors = kMaxSRVCount;
 
 	//設定をもとにSRV用デスクリプタヒープを生成
-	ID3D12DescriptorHeap* srvHeap = nullptr;
+	ComPtr<ID3D12DescriptorHeap> srvHeap;
 	result = device->CreateDescriptorHeap(
 		&srvHeapDesc ,
 		IID_PPV_ARGS(&srvHeap)
@@ -1113,7 +1113,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		}
 
 		//×ボタンで終了メッセージが来たらゲームループを抜ける
-		if (msg.message == WM_QUIT) {
+		if (msg.message == WM_QUIT){
 			break;
 		}
 #pragma endregion//ウィンドウメッセージ処理
@@ -1173,7 +1173,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//2.描画先の変更
 		//レンダーターゲットビューのハンドルを取得
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
-		rtvHandle.ptr += bbIndex * device->GetDescriptorHandleIncrementSize(rtvHeapDesc.Type);
+		rtvHandle.ptr += static_cast<unsigned long long>(bbIndex) * device->GetDescriptorHandleIncrementSize(rtvHeapDesc.Type);
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
 		commandList->OMSetRenderTargets(1 , &rtvHandle , false , &dsvHandle);
 
@@ -1234,9 +1234,9 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		commandList->SetGraphicsRootConstantBufferView(0 , constBuffMaterial->GetGPUVirtualAddress());
 
 		//SRVヒープの設定コマンド
-		commandList->SetDescriptorHeaps(1 , &srvHeap);
+		commandList->SetDescriptorHeaps(1 , srvHeap.GetAddressOf());
 
-		//SRVヒープの先頭ハンドルを取得(SRVを指しているはず)
+		//SRVヒープの先頭ハンドルを取得（SRVを指しているはず）
 		D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
 
 		if (key[DIK_SPACE]) {
@@ -1292,6 +1292,13 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 	}
 #pragma endregion//ゲームループ
+
+	//ID3D12DebugDevice* debugInterface;
+
+	//if (SUCCEEDED(device.Get()->QueryInterface(&debugInterface))) {
+	//	debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+	//	debugInterface->Release();
+	//}
 
 	//ウィンドウクラス登録解除
 	UnregisterClass(w.lpszClassName , w.hInstance);
