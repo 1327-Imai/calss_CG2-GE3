@@ -9,8 +9,7 @@
 #include <DirectXTex.h>
 #include <wrl.h>
 
-#define DIRECTINPUT_VERSION 0x0800	//DirectInoutのバージョン指定
-#include <dinput.h>
+#include "Input.h"
 
 #include <math.h>
 #include <random>
@@ -81,7 +80,7 @@ void UpdataObject3d(Object3D* object , XMMATRIX& matView , XMMATRIX& matProjecti
 
 void DrawObject3d(Object3D* object , ComPtr<ID3D12GraphicsCommandList> commandlist , D3D12_VERTEX_BUFFER_VIEW& vbView , D3D12_INDEX_BUFFER_VIEW& ibView , UINT numIndices);
 
-void MoveObject3d(Object3D* object , BYTE key[256]);
+void MoveObject3d(Object3D* object , Input* input);
 
 void SetRandomPositionObject3d(Object3D* object);
 void SetRandomRotateObject3d(Object3D* object);
@@ -360,31 +359,13 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 	result = device->CreateFence(fenceVal , D3D12_FENCE_FLAG_NONE , IID_PPV_ARGS(&fence));
 
-	//Directinputの初期化
-	IDirectInput8* directInput = nullptr;
-	result = DirectInput8Create(
-		w.hInstance ,
-		DIRECTINPUT_VERSION ,
-		IID_IDirectInput8 ,
-		(void**)&directInput ,
-		nullptr
-	);
-	assert(SUCCEEDED(result));
 #pragma endregion
 
 #pragma region// キーボードデバイスの生成
-	IDirectInputDevice8* keyboard = nullptr;
-	result = directInput->CreateDevice(GUID_SysKeyboard , &keyboard , NULL);
-	assert(SUCCEEDED(result));
 
-	//入力データのリセット
-	result = keyboard->SetDataFormat(&c_dfDIKeyboard); //標準形式
-	assert(SUCCEEDED(result));
+	Input* input = new Input();
+	input->Initialize(w,hwnd);
 
-	//排他制御レベルのリセット
-	result = keyboard->SetCooperativeLevel(
-		hwnd , DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(result));
 #pragma endregion
 
 #pragma endregion//DirectX初期化処理
@@ -1120,25 +1101,20 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 #pragma region//DirectX毎フレーム処理
 
-		//キーボード情報の取得開始
-		keyboard->Acquire();
+		input->Update();
 
-		//前キーの入力状態を取得する
-		BYTE key[256] = {};
-		keyboard->GetDeviceState(sizeof(key) , key);
 
 #pragma region//更新処理
 
-
 		//ビュー変換
 		//いずれかのキーを押していたら
-		if (key[DIK_D] || key[DIK_A]) {
+		if (input->PushKey(DIK_D) || input->PushKey(DIK_A)) {
 
 			//押したキーに応じてangleを増減させる
-			if (key[DIK_D]) {
+			if (input->PushKey(DIK_D)) {
 				angle += XMConvertToRadians(1.0f);
 			}
-			if (key[DIK_A]) {
+			if (input->PushKey(DIK_A)) {
 				angle -= XMConvertToRadians(1.0f);
 			}
 
@@ -1151,7 +1127,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 		}
 
-		MoveObject3d(&object3ds[0] , key);
+		MoveObject3d(&object3ds[0] , input);
 
 		for (int i = 0; i < _countof(object3ds); i++) {
 			UpdataObject3d(&object3ds[i] , matView , matProjection);
@@ -1180,7 +1156,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//3.画面クリア
 		FLOAT clearColor[] = {0.1f , 0.25f , 0.5f , 0.0f};
 
-		if (key[DIK_SPACE]) {
+		if (input->PushKey(DIK_SPACE)) {
 
 			clearColor[0] = 0.5f;
 			clearColor[1] = 0.1f;
@@ -1239,7 +1215,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//SRVヒープの先頭ハンドルを取得（SRVを指しているはず）
 		D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
 
-		if (key[DIK_SPACE]) {
+		if (input->PushKey(DIK_SPACE)) {
 			//二枚目を指し示すように差し込む
 			srvGpuHandle.ptr += incremantSize;
 		}
@@ -1403,19 +1379,22 @@ void DrawObject3d(Object3D* object , ComPtr<ID3D12GraphicsCommandList> commandli
 	commandlist->DrawIndexedInstanced(numIndices , 1 , 0 , 0 , 0);
 }
 
-void MoveObject3d(Object3D* object , BYTE key[256]) {
-	if (key[DIK_UP] || key[DIK_DOWN] || key[DIK_RIGHT] || key[DIK_LEFT]) {
+void MoveObject3d(Object3D* object , Input* input) {
+	if (input->PushKey(DIK_UP) ||
+		input->PushKey(DIK_DOWN) ||
+		input->PushKey(DIK_RIGHT) ||
+		input->PushKey(DIK_LEFT)) {
 
-		if (key[DIK_UP]) {
+		if (input->PushKey(DIK_UP)) {
 			object->position.y += 1.0f;
 		}
-		if (key[DIK_DOWN]) {
+		if (input->PushKey(DIK_DOWN)) {
 			object->position.y -= 1.0f;
 		}
-		if (key[DIK_RIGHT]) {
+		if (input->PushKey(DIK_RIGHT)) {
 			object->position.x += 1.0f;
 		}
-		if (key[DIK_LEFT]) {
+		if (input->PushKey(DIK_LEFT)) {
 			object->position.x -= 1.0f;
 		}
 	}
