@@ -46,9 +46,9 @@ void Input::Update() {
 }
 
 //ƒL[‚Ì“ü—Íî•ñ‚ğæ“¾‚·‚éŠÖ”
-int Input::TriggerKey(int keyName) {
+bool Input::TriggerKey(BYTE keyName) {
 
-	if (key_[keyName] == true&&oldKey_[keyName]==false) {
+	if (key_[keyName] && !oldKey_[keyName]) {
 		return true;
 	}
 	else {
@@ -57,9 +57,9 @@ int Input::TriggerKey(int keyName) {
 
 }
 
-int Input::PushKey(int keyName) {
+bool Input::PushKey(BYTE keyName) {
 
-	if (key_[keyName] == true) {
+	if (key_[keyName]) {
 		return true;
 	}
 	else {
@@ -68,9 +68,9 @@ int Input::PushKey(int keyName) {
 
 }
 
-int Input::ReleaseKey(int keyName) {
+bool Input::ReleaseKey(BYTE keyName) {
 
-	if (key_[keyName] == false && oldKey_[keyName] == true) {
+	if (!key_[keyName] && oldKey_[keyName]) {
 		return true;
 	}
 	else {

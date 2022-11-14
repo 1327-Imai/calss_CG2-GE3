@@ -11,7 +11,7 @@ class Input {
 	//メンバ関数
 public:
 
-template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	//初期化
 	void Initialize(WinApp* winApp);
@@ -21,13 +21,13 @@ template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	//キーの入力情報を取得する関数
 	//プッシュ
-	int PushKey(int keyName);
+	bool PushKey(BYTE keyName);
 
 	//トリガー
-	int TriggerKey(int keyName);
+	bool TriggerKey(BYTE keyName);
 
 	//リリース
-	int ReleaseKey(int keyName);
+	bool ReleaseKey(BYTE keyName);
 
 	//メンバ変数
 private:
