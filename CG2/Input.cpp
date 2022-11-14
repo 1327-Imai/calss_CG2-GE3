@@ -1,12 +1,17 @@
 #include "Input.h"
 
-void Input::Initialize(WNDCLASSEX w,HWND hwnd) {
+void Input::Initialize(WinApp* winApp) {
 
 	HRESULT result;
+	
+	//nullptrチェック
+	assert(winApp);
+
+	winApp_ = winApp;
 
 	//Directinputの初期化
 	result = DirectInput8Create(
-		w.hInstance ,
+		winApp->GetHInstance() ,
 		DIRECTINPUT_VERSION ,
 		IID_IDirectInput8 ,
 		(void**)&directInput_ ,
@@ -23,7 +28,7 @@ void Input::Initialize(WNDCLASSEX w,HWND hwnd) {
 
 	//排他制御レベルのリセット
 	result = keyboard_->SetCooperativeLevel(
-		hwnd , DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+		winApp->GetHwnd() , DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 
 }

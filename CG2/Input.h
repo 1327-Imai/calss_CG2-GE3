@@ -4,6 +4,7 @@
 #include <cassert>
 #include <wrl.h>
 
+#include "WinApp.h"
 
 class Input {
 
@@ -13,7 +14,7 @@ public:
 template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	//èâä˙âª
-	void Initialize(WNDCLASSEX w,HWND hwnd);
+	void Initialize(WinApp* winApp);
 
 	//çXêV
 	void Update();
@@ -39,5 +40,6 @@ private:
 	BYTE key_[256] = {};
 	BYTE oldKey_[256] = {};
 
+	WinApp* winApp_ = nullptr;
 };
 
