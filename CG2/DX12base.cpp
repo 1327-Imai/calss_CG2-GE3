@@ -18,6 +18,8 @@ void DX12base::Initialize(WinApp* winApp) {
 
 	//DirectX初期化処理
 
+	InitializeFixFPS();
+
 	//アダプタの列挙
 	//DX6Iファクトリーの生成
 	result = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
@@ -154,6 +156,8 @@ void DX12base::PostDraw() {
 			CloseHandle(event);
 		}
 	}
+
+	UpdateFixFPS();
 
 	//キューをクリア
 	result = cmdAllocator_->Reset();
@@ -296,6 +300,37 @@ void DX12base::CreateFence(){
 	result = device_->CreateFence(fenceVal_ , D3D12_FENCE_FLAG_NONE , IID_PPV_ARGS(&fence_));
 
 	assert(SUCCEEDED(result));
+
+}
+
+void DX12base::InitializeFixFPS() {
+
+	reference_ = std::chrono::steady_clock::now();
+
+}
+
+void DX12base::UpdateFixFPS() {
+
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	//現在時間を取得
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+	//前回記録からの経過時間を取得する
+	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+
+	//1/60秒(よりわずかに短い時間)経っていない場合
+	if (elapsed < kMinCheckTime) {
+		//1/60秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			//1μsスリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+
+	reference_ = std::chrono::steady_clock::now();
 
 }
 

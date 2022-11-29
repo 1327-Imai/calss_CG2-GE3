@@ -1,5 +1,7 @@
 #include "WinApp.h"
 
+#pragma comment(lib,"winmm.lib");
+
 void WinApp::Initialize() {
 
 #pragma region//ウィンドウの生成
@@ -35,6 +37,10 @@ void WinApp::Initialize() {
 
 	//ウィンドウを表示状態にする
 	ShowWindow(hwnd_ , SW_SHOW);
+
+	//システムタイマーの分解能を上げる
+	timeBeginPeriod(1);
+
 #pragma endregion//ウィンドウの生成
 
 }

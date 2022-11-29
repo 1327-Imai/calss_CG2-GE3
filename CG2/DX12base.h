@@ -3,6 +3,8 @@
 #include <dxgi1_6.h>
 #include <DirectXmath.h>
 #include <wrl.h>
+#include <chrono>
+#include <thread>
 
 #include <cassert>
 #include <vector>
@@ -35,6 +37,10 @@ private:
 	void DepthTest();
 
 	void CreateFence();
+
+	void InitializeFixFPS();
+
+	void UpdateFixFPS();
 
 public:
 	//アクセッサ
@@ -133,6 +139,10 @@ private:
 
 #pragma endregion
 
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
+
+	//WinAppのポインタ
 	WinApp* winApp_ = nullptr;
 };
 
