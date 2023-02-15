@@ -131,6 +131,7 @@ void DX12base::PostDraw() {
 	bbIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	//5.リソースバリアを戻す
+	barrierDesc_.Transition.pResource = backBuffers_[bbIndex_].Get();			//バックバッファを指定
 	barrierDesc_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;	//描画状態から
 	barrierDesc_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;			//表示状態へ
 	commandList_->ResourceBarrier(1 , &barrierDesc_);

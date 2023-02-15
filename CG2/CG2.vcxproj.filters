@@ -103,9 +103,6 @@
     <None Include="Resources\shader\Basic\Basic.hlsli">
       <Filter>shader\Basic</Filter>
     </None>
-    <None Include="Resources\shader\Sprite\Sprite.hlsli">
-      <Filter>shader\Sprite</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Basic\BasicVS.hlsl">
@@ -114,10 +111,10 @@
     <FxCompile Include="Resources\shader\Basic\BasicPS.hlsl">
       <Filter>shader\Basic</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Sprite\SpriteVS.hlsl">
+    <FxCompile Include="Resources\shader\Sprite\SpritePS.hlsl">
       <Filter>shader\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Sprite\SpritePS.hlsl">
+    <FxCompile Include="Resources\shader\Sprite\SpriteVS.hlsl">
       <Filter>shader\Sprite</Filter>
     </FxCompile>
   </ItemGroup>
