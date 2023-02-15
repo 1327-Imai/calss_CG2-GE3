@@ -1,49 +1,124 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
+    <Filter Include="source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
+    <Filter Include="header">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
+    <Filter Include="header\Math">
+      <UniqueIdentifier>{21e59e16-ffda-445a-860f-f81651fe7862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\math">
+      <UniqueIdentifier>{175051cd-99ca-495f-890c-e77096e0d0e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="shader\Basic">
+      <UniqueIdentifier>{b87785d0-e973-48fd-afca-0603e0195756}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader\Sprite">
+      <UniqueIdentifier>{d3676579-2d16-445e-b199-c74278037736}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="WinApp.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="DX12base.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>source</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="BasicVS.hlsl" />
-    <FxCompile Include="BasicPS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Basic.hlsli" />
+    <ClCompile Include="Sprite.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteCommon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="math\MathFunc.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Matrix4.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Vector2.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Vector3.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Vector4.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldTransform.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="WinApp.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="DX12base.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteCommon.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="math\MathFunc.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Matrix4.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Vector2.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Vector3.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Vector4.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldTransform.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shader\Basic\Basic.hlsli">
+      <Filter>shader\Basic</Filter>
+    </None>
+    <None Include="Resources\shader\Sprite\Sprite.hlsli">
+      <Filter>shader\Sprite</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\shader\Basic\BasicVS.hlsl">
+      <Filter>shader\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Basic\BasicPS.hlsl">
+      <Filter>shader\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Sprite\SpriteVS.hlsl">
+      <Filter>shader\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Sprite\SpritePS.hlsl">
+      <Filter>shader\Sprite</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
