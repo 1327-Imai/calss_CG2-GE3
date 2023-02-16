@@ -103,6 +103,9 @@
     <None Include="Resources\shader\Basic\Basic.hlsli">
       <Filter>shader\Basic</Filter>
     </None>
+    <None Include="Resources\shader\Sprite\Sprite.hlsli">
+      <Filter>shader\Sprite</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Basic\BasicVS.hlsl">

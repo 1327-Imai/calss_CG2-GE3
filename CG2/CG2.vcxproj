@@ -179,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shader\Basic\Basic.hlsli" />
+    <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Basic\BasicPS.hlsl">

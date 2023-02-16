@@ -1,6 +1,6 @@
 #include "WinApp.h"
 
-#pragma comment(lib,"winmm.lib");
+#pragma comment(lib,"winmm.lib")
 
 void WinApp::Initialize() {
 

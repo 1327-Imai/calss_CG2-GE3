@@ -103,14 +103,14 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 #endif
 
 	//DirectX基礎
-	DX12base* dx12Base = new DX12base;
-	dx12Base->Initialize(winApp);
+	DX12base* dx12base = new DX12base;
+	dx12base->Initialize(winApp);
 
 	SpriteCommon* spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize(dx12Base);
+	spriteCommon->Initialize(dx12base);
 
 	//DirectX初期化処理
-	HRESULT result;
+	//HRESULT result;
 
 #pragma region// キーボードデバイスの生成
 
@@ -142,7 +142,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //		{{-5.0f , -5.0f , 5.0f} , {} , {0.0f , 1.0f}} ,//左下 インデックス0
 //		{{-5.0f , 5.0f , 5.0f} , {} , {0.0f , 0.0f}} ,//左上 インデックス1
 //		{{5.0f , -5.0f , 5.0f} , {} , {1.0f , 1.0f}} ,//右下 インデックス2
-//		{{5.0f , 5.0f , 5.0f} , {} , {1.0f , 0.0f}} ,//右上 インデックス3
+//		{{5.0f , 5.0f  5.0f} , {} , {1.0f , 0.0f}} ,//右上 インデックス3
 //		//左
 //		{{-5.0f , -5.0f , -5.0f} , {} , {0.0f , 1.0f}} ,//左下 インデックス0
 //		{{-5.0f , -5.0f , 5.0f} , {} , {0.0f , 0.0f}} ,//左上 インデックス1
@@ -241,7 +241,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//頂点バッファの生成
 //	ComPtr<ID3D12Resource> vertBuff = nullptr;
-//	result = dx12Base->GetDevice()->CreateCommittedResource(
+//	result = dx12base->GetDevice()->CreateCommittedResource(
 //		&heapProp ,	//ヒープ設定
 //		D3D12_HEAP_FLAG_NONE ,
 //		&resDesc ,	//リソース設定
@@ -253,7 +253,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//インデックスバッファの生成
 //	ComPtr<ID3D12Resource> indexBuff = nullptr;
-//	result = dx12Base->GetDevice()->CreateCommittedResource(
+//	result = dx12base->GetDevice()->CreateCommittedResource(
 //		&heapProp ,	//ヒープ設定
 //		D3D12_HEAP_FLAG_NONE ,
 //		&resDesc ,	//リソース設定
@@ -380,7 +380,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 //		} ,
 //		{//uv座標
-//			"TEXCODE" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
+//			"TEXCOORD" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
 //			D3D12_APPEND_ALIGNED_ELEMENT ,
 //			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 //		} ,
@@ -501,7 +501,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //		&errorBlob);
 //	assert(SUCCEEDED(result));
 //
-//	result = dx12Base->GetDevice()->CreateRootSignature(
+//	result = dx12base->GetDevice()->CreateRootSignature(
 //		0 ,
 //		rootSigBlob->GetBufferPointer() ,
 //		rootSigBlob->GetBufferSize() ,
@@ -514,7 +514,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//パイプラインステートの生成
 //	ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-//	result = dx12Base->GetDevice()->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState));
+//	result = dx12base->GetDevice()->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState));
 //	assert(SUCCEEDED(result));
 //
 //#pragma region//定数バッファ
@@ -536,7 +536,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	ComPtr<ID3D12Resource> constBuffMaterial = nullptr;
 //	//定数バッファの生成
-//	result = dx12Base->GetDevice()->CreateCommittedResource(
+//	result = dx12base->GetDevice()->CreateCommittedResource(
 //		&cbHeapProp ,	//ヒープ設定
 //		D3D12_HEAP_FLAG_NONE ,
 //		&cbResourceDesc ,	//リソース設定
@@ -615,7 +615,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //	for (int i = 0; i < _countof(object3ds); i++) {
 //
 //		//初期化
-//		InitializeObject3d(&object3ds[i] , dx12Base->GetDevice());
+//		InitializeObject3d(&object3ds[i] , dx12base->GetDevice());
 //
 //		//ここから下は親子構造のサンプル
 //		//先頭以外なら
@@ -726,7 +726,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//テクスチャバッファの生成
 //	ComPtr<ID3D12Resource> texBuff = nullptr;
-//	result = dx12Base->GetDevice()->CreateCommittedResource(
+//	result = dx12base->GetDevice()->CreateCommittedResource(
 //		&textureHeapProp ,	//ヒープ設定
 //		D3D12_HEAP_FLAG_NONE ,
 //		&textureResouceDesc ,	//リソース設定
@@ -738,7 +738,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//テクスチャバッファの生成
 //	ComPtr<ID3D12Resource> texBuff2 = nullptr;
-//	result = dx12Base->GetDevice()->CreateCommittedResource(
+//	result = dx12base->GetDevice()->CreateCommittedResource(
 //		&textureHeapProp ,	//ヒープ設定
 //		D3D12_HEAP_FLAG_NONE ,
 //		&textureResouceDesc2 ,	//リソース設定
@@ -794,7 +794,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //
 //	//設定をもとにSRV用デスクリプタヒープを生成
 //	ComPtr<ID3D12DescriptorHeap> srvHeap;
-//	result = dx12Base->GetDevice()->CreateDescriptorHeap(
+//	result = dx12base->GetDevice()->CreateDescriptorHeap(
 //		&srvHeapDesc ,
 //		IID_PPV_ARGS(&srvHeap)
 //	);
@@ -813,11 +813,11 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //	srvDesc.Texture2D.MipLevels = resDesc.MipLevels;
 //
 //	//ハンドルの指す位置にシェーダーリソースビュー作成
-//	dx12Base->GetDevice()->CreateShaderResourceView(texBuff.Get() , &srvDesc , srvHandle);
+//	dx12base->GetDevice()->CreateShaderResourceView(texBuff.Get() , &srvDesc , srvHandle);
 //
 //	//二枚目
 //	//SRVヒープの先頭ハンドルを取得
-//	UINT incremantSize = dx12Base->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+//	UINT incremantSize = dx12base->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 //	srvHandle.ptr += incremantSize;
 //
 //	//シェーダーリソースビューの作成
@@ -829,7 +829,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 //	srvDesc2.Texture2D.MipLevels = textureResouceDesc2.MipLevels;
 //
 //	//ハンドルの指す位置にシェーダーリソースビュー作成
-//	dx12Base->GetDevice()->CreateShaderResourceView(texBuff2.Get() , &srvDesc2 , srvHandle);
+//	dx12base->GetDevice()->CreateShaderResourceView(texBuff2.Get() , &srvDesc2 , srvHandle);
 
 #pragma endregion
 
@@ -838,7 +838,7 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 #pragma region//ゲームループ前初期化処理
 
 	Sprite* sprite = new Sprite;
-	sprite->Initialize(spriteCommon);
+	sprite->Initialize(spriteCommon,input);
 
 #pragma endregion
 
@@ -886,29 +886,31 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//	UpdataObject3d(&object3ds[i] , matView , matProjection);
 		//}
 
+		sprite->Update();
+
 #pragma endregion//更新処理
 
 #pragma region//描画処理
-		dx12Base->PreDraw();
+		dx12base->PreDraw();
 
 		////パイプラインステートとルートシグネチャの設定コマンド
-		//dx12Base->GetCmdList()->SetPipelineState(pipelineState.Get());
-		//dx12Base->GetCmdList()->SetGraphicsRootSignature(rootSignature.Get());
+		//dx12base->GetCmdList()->SetPipelineState(pipelineState.Get());
+		//dx12base->GetCmdList()->SetGraphicsRootSignature(rootSignature.Get());
 
 		////プリミティブ形状の設定コマンド
-		//dx12Base->GetCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//dx12base->GetCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		////頂点バッファビューの設定コマンド
-		//dx12Base->GetCmdList()->IASetVertexBuffers(0 , 1 , &vbView);
+		//dx12base->GetCmdList()->IASetVertexBuffers(0 , 1 , &vbView);
 
 		////インデックスバッファビューの設定コマンド
-		//dx12Base->GetCmdList()->IASetIndexBuffer(&ibView);
+		//dx12base->GetCmdList()->IASetIndexBuffer(&ibView);
 
 		////頂点バッファ―ビューをセットするコマンド
-		//dx12Base->GetCmdList()->SetGraphicsRootConstantBufferView(0 , constBuffMaterial->GetGPUVirtualAddress());
+		//dx12base->GetCmdList()->SetGraphicsRootConstantBufferView(0 , constBuffMaterial->GetGPUVirtualAddress());
 
 		////SRVヒープの設定コマンド
-		//dx12Base->GetCmdList()->SetDescriptorHeaps(1 , srvHeap.GetAddressOf());
+		//dx12base->GetCmdList()->SetDescriptorHeaps(1 , srvHeap.GetAddressOf());
 
 		////SRVヒープの先頭ハンドルを取得（SRVを指しているはず）
 		//D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
@@ -919,17 +921,17 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//}
 
 		////SRVヒープの先頭にあるSRVをルートパラメータ1番に設定
-		//dx12Base->GetCmdList()->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
+		//dx12base->GetCmdList()->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
 
 		//for (int i = 0; i < _countof(object3ds); i++) {
-		//	DrawObject3d(&object3ds[i] , dx12Base->GetCmdList() , vbView , ibView , _countof(indices));
+		//	DrawObject3d(&object3ds[i] , dx12base->GetCmdList() , vbView , ibView , _countof(indices));
 		//}
 
 		spriteCommon->PreDraw();
 
 		sprite->Draw();
 
-		dx12Base->PostDraw();
+		dx12base->PostDraw();
 #pragma endregion//描画処理
 
 #pragma endregion//DirectX毎フレーム処理
@@ -939,18 +941,20 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 	//ID3D12DebugDevice* debugInterface;
 
-	//if (SUCCEEDED(device.Get()->QueryInterface(&debugInterface))) {
+	//if (SUCCEEDED(dx12base->GetDevice().Get()->QueryInterface(&debugInterface))) {
 	//	debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
 	//	debugInterface->Release();
 	//}
 
 	delete input;
 
+	delete sprite;
+	delete spriteCommon;
+	
+	delete dx12base;
+
 	winApp->Finalize();
 	delete winApp;
-
-	delete dx12Base;
-	delete spriteCommon;
 
 #pragma endregion//メッセージループ
 
