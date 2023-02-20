@@ -110,16 +110,16 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		}
 
 		if (input->PushKey(DIK_A)) {
-			sprite->SetScale(Vector2{sprite->GetScale().x - 0.1f , sprite->GetScale().y});
+			sprite->SetSize(Vector2{sprite->GetSize().x - 1.0f , sprite->GetSize().y});
 		}
 		if (input->PushKey(DIK_S)) {
-			sprite->SetScale(Vector2{sprite->GetScale().x + 0.1f , sprite->GetScale().y});
+			sprite->SetSize(Vector2{sprite->GetSize().x + 1.0f , sprite->GetSize().y});
 		}
 		if (input->PushKey(DIK_Z)) {
-			sprite->SetScale(Vector2{sprite->GetScale().x , sprite->GetScale().y - 0.1f});
+			sprite->SetSize(Vector2{sprite->GetSize().x , sprite->GetSize().y - 1.0f});
 		}
 		if (input->PushKey(DIK_X)) {
-			sprite->SetScale(Vector2{sprite->GetScale().x , sprite->GetScale().y + 0.1f});
+			sprite->SetSize(Vector2{sprite->GetSize().x , sprite->GetSize().y + 1.0f});
 		}
 
 		if (input->TriggerKey(DIK_R)) {
