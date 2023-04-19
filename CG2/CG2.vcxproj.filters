@@ -25,26 +25,26 @@
     <Filter Include="shader\Sprite">
       <UniqueIdentifier>{d3676579-2d16-445e-b199-c74278037736}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Sprite">
+      <UniqueIdentifier>{5aad576f-57e6-434c-be76-d11319e08d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\Sprite">
+      <UniqueIdentifier>{b08de84f-c36e-411e-8048-812e1ead4396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\Input">
+      <UniqueIdentifier>{597efe1a-4330-4b7e-b0b1-04dbde323c9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Input">
+      <UniqueIdentifier>{3ee39bde-82cd-4565-ab8f-e5c650abaede}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Base">
+      <UniqueIdentifier>{23dfb840-9cce-4aa9-969c-f8395fe2e5fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\Base">
+      <UniqueIdentifier>{b8ec1507-512b-4300-bba9-f6418915b533}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="WinApp.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12base.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteCommon.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="math\MathFunc.cpp">
       <Filter>source\math</Filter>
     </ClCompile>
@@ -60,26 +60,29 @@
     <ClCompile Include="math\Vector4.cpp">
       <Filter>source\math</Filter>
     </ClCompile>
-    <ClCompile Include="WorldTransform.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="Base\main.cpp">
+      <Filter>source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\DX12base.cpp">
+      <Filter>source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\WinApp.cpp">
+      <Filter>source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Input.cpp">
+      <Filter>source\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="math\WorldTransform.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\Sprite.cpp">
+      <Filter>source\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteCommon.cpp">
+      <Filter>source\Sprite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Input.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="WinApp.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12base.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteCommon.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="math\MathFunc.h">
       <Filter>header\Math</Filter>
     </ClInclude>
@@ -95,8 +98,23 @@
     <ClInclude Include="math\Vector4.h">
       <Filter>header\Math</Filter>
     </ClInclude>
-    <ClInclude Include="WorldTransform.h">
-      <Filter>header</Filter>
+    <ClInclude Include="Base\DX12base.h">
+      <Filter>header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\WinApp.h">
+      <Filter>header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>header\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="math\WorldTransform.h">
+      <Filter>header\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\Sprite.h">
+      <Filter>header\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\SpriteCommon.h">
+      <Filter>header\Sprite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -134,7 +134,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Sprite;$(ProjectDir)Input;$(ProjectDir)Base;$(ProjectDir)3D;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,18 +145,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DX12base.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Base\DX12base.cpp" />
+    <ClCompile Include="Base\main.cpp" />
+    <ClCompile Include="Base\WinApp.cpp" />
+    <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="math\MathFunc.cpp" />
     <ClCompile Include="math\Matrix4.cpp" />
     <ClCompile Include="math\Vector2.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="math\Vector4.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="SpriteCommon.cpp" />
-    <ClCompile Include="WinApp.cpp" />
-    <ClCompile Include="WorldTransform.cpp" />
+    <ClCompile Include="math\WorldTransform.cpp" />
+    <ClCompile Include="Sprite\Sprite.cpp" />
+    <ClCompile Include="Sprite\SpriteCommon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -163,8 +164,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DX12base.h" />
-    <ClInclude Include="Input.h" />
+    <ClInclude Include="Base\DX12base.h" />
+    <ClInclude Include="Base\WinApp.h" />
+    <ClInclude Include="Input\Input.h" />
     <ClInclude Include="math\MathFunc.h">
       <DeploymentContent>false</DeploymentContent>
     </ClInclude>
@@ -172,10 +174,9 @@
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteCommon.h" />
-    <ClInclude Include="WinApp.h" />
-    <ClInclude Include="WorldTransform.h" />
+    <ClInclude Include="math\WorldTransform.h" />
+    <ClInclude Include="Sprite\Sprite.h" />
+    <ClInclude Include="Sprite\SpriteCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shader\Basic\Basic.hlsli" />
