@@ -43,6 +43,12 @@
     <Filter Include="header\Base">
       <UniqueIdentifier>{b8ec1507-512b-4300-bba9-f6418915b533}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\Scene">
+      <UniqueIdentifier>{53319076-e12f-4da8-9639-08ad6d56e162}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Scene">
+      <UniqueIdentifier>{bde4d532-f041-41e7-8957-e24b35c64f37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math\MathFunc.cpp">
@@ -63,7 +69,7 @@
     <ClCompile Include="Base\main.cpp">
       <Filter>source\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Base\DX12base.cpp">
+    <ClCompile Include="Base\DirectXCommon.cpp">
       <Filter>source\Base</Filter>
     </ClCompile>
     <ClCompile Include="Base\WinApp.cpp">
@@ -80,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="Sprite\SpriteCommon.cpp">
       <Filter>source\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\GameScene.cpp">
+      <Filter>source\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,7 +107,7 @@
     <ClInclude Include="math\Vector4.h">
       <Filter>header\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Base\DX12base.h">
+    <ClInclude Include="Base\DirectXCommon.h">
       <Filter>header\Base</Filter>
     </ClInclude>
     <ClInclude Include="Base\WinApp.h">
@@ -115,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="Sprite\SpriteCommon.h">
       <Filter>header\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\GameScene.h">
+      <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

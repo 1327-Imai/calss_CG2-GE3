@@ -23,7 +23,7 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-class DX12base{
+class DirectXCommon{
 
 public:
 	//ƒƒ“ƒoŠÖ”

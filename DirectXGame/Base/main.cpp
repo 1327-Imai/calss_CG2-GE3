@@ -4,12 +4,8 @@
 #include <random>
 
 #include "WinApp.h"
-#include "Input.h"
-#include "DX12base.h"
-#include "SpriteCommon.h"
-#include "Sprite.h"
-#include "WorldTransform.h"
-
+#include "DirectXCommon.h"
+#include "GameScene.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -49,25 +45,11 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 #endif
 
 	//DirectX基礎
-	DX12base* dx12base = new DX12base;
-	dx12base->Initialize(winApp);
+	DirectXCommon* dxCommon = new DirectXCommon;
+	dxCommon->Initialize(winApp);
 
-	//スプライト共通処理
-	SpriteCommon* spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize(dx12base);
-
-	// キーボードデバイスの生成
-	Input* input = new Input();
-	input->Initialize(winApp);
-
-	//ゲームループ前初期化処理
-	spriteCommon->LoadTexture(0 , "texture.jpg");
-	spriteCommon->LoadTexture(1 , "reimu.png");
-
-	//スプライト
-	Sprite* sprite = new Sprite;
-	sprite->Initialize(spriteCommon , 1);
-
+	GameScene* gameScene = new GameScene;
+	gameScene->Initialize(winApp,dxCommon);
 
 	//ゲームループ
 	while (true) {
@@ -79,35 +61,28 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 
 		//DirectX毎フレーム処理
 		//更新処理
-		input->Update();
-		
+		gameScene->Update();
 
 		//描画処理
-		dx12base->PreDraw();
+		dxCommon->PreDraw();
 
-		//スプライト描画
-		spriteCommon->PreDraw();
+		gameScene->Draw();
 
-		sprite->Draw();
-
-		dx12base->PostDraw();
+		dxCommon->PostDraw();
 
 	}
 
 	//ID3D12DebugDevice* debugInterface;
 
-	//if (SUCCEEDED(dx12base->GetDevice().Get()->QueryInterface(&debugInterface))) {
+	//if (SUCCEEDED(dxCommon->GetDevice().Get()->QueryInterface(&debugInterface))) {
 	//	debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
 	//	debugInterface->Release();
 	//}
 
 	//終了時処理
-	delete input;
+	delete gameScene;
 
-	delete sprite;
-	delete spriteCommon;
-
-	delete dx12base;
+	delete dxCommon;
 
 	winApp->Finalize();
 	delete winApp;

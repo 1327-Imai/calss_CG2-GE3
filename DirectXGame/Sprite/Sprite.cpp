@@ -16,7 +16,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon , uint32_t textureIndex) {
 	spriteCommon_ = spriteCommon;
 
 	//DirectX基礎
-	dx12base_ = spriteCommon_->GetDX12Base();
+	dxCommon_ = spriteCommon_->GetDX12Base();
 
 	HRESULT result;
 
@@ -128,18 +128,18 @@ void Sprite::Draw() {
 		return;
 	}
 	////頂点バッファの設定
-	dx12base_->GetCmdList()->IASetVertexBuffers(0 , 1 , spriteCommon_->GetVBView());
+	dxCommon_->GetCmdList()->IASetVertexBuffers(0 , 1 , spriteCommon_->GetVBView());
 
 	//定数バッファ―ビューをセットするコマンド
-	dx12base_->GetCmdList()->SetGraphicsRootConstantBufferView(0 , constBuffMaterial_->GetGPUVirtualAddress());
+	dxCommon_->GetCmdList()->SetGraphicsRootConstantBufferView(0 , constBuffMaterial_->GetGPUVirtualAddress());
 
 	spriteCommon_->SetTextureCommands(textureIndex_);
 
 	//定数バッファビュー(CBV)の設定コマンド
-	dx12base_->GetCmdList()->SetGraphicsRootConstantBufferView(2 , constBuffTransform_->GetGPUVirtualAddress());
+	dxCommon_->GetCmdList()->SetGraphicsRootConstantBufferView(2 , constBuffTransform_->GetGPUVirtualAddress());
 
 	//描画コマンド
-	dx12base_->GetCmdList()->DrawInstanced(spriteCommon_->GetVerticesValue() , 1 , 0 , 0);
+	dxCommon_->GetCmdList()->DrawInstanced(spriteCommon_->GetVerticesValue() , 1 , 0 , 0);
 }
 
 void Sprite::CreateConstMapTransform() {
@@ -161,7 +161,7 @@ void Sprite::CreateConstMapTransform() {
 	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//定数バッファの生成
-	result = dx12base_->GetDevice()->CreateCommittedResource(
+	result = dxCommon_->GetDevice()->CreateCommittedResource(
 		&cbHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&cbResourceDesc ,	//リソース設定
@@ -198,7 +198,7 @@ void Sprite::CreateConstMapMaterial() {
 	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//定数バッファの生成
-	result = dx12base_->GetDevice()->CreateCommittedResource(
+	result = dxCommon_->GetDevice()->CreateCommittedResource(
 		&cbHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&cbResourceDesc ,	//リソース設定

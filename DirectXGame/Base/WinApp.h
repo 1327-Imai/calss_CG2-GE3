@@ -36,7 +36,5 @@ private:
 	//ウィンドウハンドル
 	HWND hwnd_;
 
-
-
 };
 
