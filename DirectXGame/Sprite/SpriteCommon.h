@@ -2,7 +2,7 @@
 #include "MathFunc.h"
 #include "vector"
 #include <array>
-#include "DX12base.h"
+#include "DirectXCommon.h"
 
 class SpriteCommon {
 public:
@@ -14,7 +14,7 @@ public:
 	~SpriteCommon();
 
 	//ÉÅÉìÉoä÷êî
-	void Initialize(DX12base* dx12base);
+	void Initialize(DirectXCommon* dxCommon);
 
 	void PreDraw();
 
@@ -22,7 +22,7 @@ public:
 
 	D3D12_VERTEX_BUFFER_VIEW* GetVBView();
 
-	DX12base* GetDX12Base();
+	DirectXCommon* GetDX12Base();
 
 	void Set2DCoordinateSystem(Matrix4& mat);
 
@@ -45,7 +45,7 @@ private:
 private:
 
 	//DirectXäÓëb
-	DX12base* dx12base_ = nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
 
 	//í∏ì_
 	Vertex vertices_[4];

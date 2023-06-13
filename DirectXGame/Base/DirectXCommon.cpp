@@ -1,6 +1,6 @@
-#include "DX12base.h"
+#include "DirectXCommon.h"
 
-void DX12base::Initialize(WinApp* winApp) {
+void DirectXCommon::Initialize(WinApp* winApp) {
 	
 	//nullptrチェック
 	assert(winApp);
@@ -78,7 +78,7 @@ void DX12base::Initialize(WinApp* winApp) {
 	CreateFence();
 }
 
-void DX12base::PreDraw() {
+void DirectXCommon::PreDraw() {
 	//バックバッファの番号を取得
 	bbIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -126,7 +126,7 @@ void DX12base::PreDraw() {
 
 }
 
-void DX12base::PostDraw() {
+void DirectXCommon::PostDraw() {
 	//バックバッファの番号を取得
 	bbIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -168,7 +168,7 @@ void DX12base::PostDraw() {
 
 }
 
-void DX12base::CreateCmdList() {
+void DirectXCommon::CreateCmdList() {
 
 	//コマンドアロケータを生成
 	result = device_->CreateCommandAllocator(
@@ -196,7 +196,7 @@ void DX12base::CreateCmdList() {
 
 }
 
-void DX12base::SetSwapChain() {
+void DirectXCommon::SetSwapChain() {
 
 	swapChainDesc_.Width = winApp_->WINDOW_WIDTH;
 	swapChainDesc_.Height = winApp_->WINDOW_HEIGHT;
@@ -253,7 +253,7 @@ void DX12base::SetSwapChain() {
 
 }
 
-void DX12base::DepthTest() {
+void DirectXCommon::DepthTest() {
 	D3D12_RESOURCE_DESC depthResourceDesc{};
 	depthResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	depthResourceDesc.Width = winApp_->WINDOW_WIDTH;		//レンダーターゲットに合わせる
@@ -295,7 +295,7 @@ void DX12base::DepthTest() {
 	);
 }
 
-void DX12base::CreateFence(){
+void DirectXCommon::CreateFence(){
 
 	//フェンスの生成
 	result = device_->CreateFence(fenceVal_ , D3D12_FENCE_FLAG_NONE , IID_PPV_ARGS(&fence_));
@@ -304,13 +304,13 @@ void DX12base::CreateFence(){
 
 }
 
-void DX12base::InitializeFixFPS() {
+void DirectXCommon::InitializeFixFPS() {
 
 	reference_ = std::chrono::steady_clock::now();
 
 }
 
-void DX12base::UpdateFixFPS() {
+void DirectXCommon::UpdateFixFPS() {
 
 	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
 
@@ -336,10 +336,10 @@ void DX12base::UpdateFixFPS() {
 }
 
 //アクセッサ
-ComPtr<ID3D12GraphicsCommandList> DX12base::GetCmdList() {
+ComPtr<ID3D12GraphicsCommandList> DirectXCommon::GetCmdList() {
 	return commandList_.Get();
 }
 
-ComPtr<ID3D12Device> DX12base::GetDevice() {
+ComPtr<ID3D12Device> DirectXCommon::GetDevice() {
 	return device_.Get();
 }

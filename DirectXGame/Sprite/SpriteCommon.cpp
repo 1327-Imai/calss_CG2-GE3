@@ -13,9 +13,9 @@ SpriteCommon::~SpriteCommon() {
 }
 
 //メンバ関数
-void SpriteCommon::Initialize(DX12base* dx12base) {
+void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 
-	dx12base_ = dx12base;
+	dxCommon_ = dxCommon;
 
 
 	HRESULT result;
@@ -43,7 +43,7 @@ void SpriteCommon::Initialize(DX12base* dx12base) {
 	resDesc_.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//頂点バッファの設定
-	result = dx12base_->GetDevice()->CreateCommittedResource(
+	result = dxCommon_->GetDevice()->CreateCommittedResource(
 		&heapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&resDesc_ ,	//リソース設定
@@ -247,7 +247,7 @@ void SpriteCommon::Initialize(DX12base* dx12base) {
 										 &rootSigBlob , &errorBlob);
 	assert(SUCCEEDED(result));
 
-	result = dx12base_->GetDevice()->CreateRootSignature(0 , rootSigBlob->GetBufferPointer() , rootSigBlob->GetBufferSize() ,
+	result = dxCommon_->GetDevice()->CreateRootSignature(0 , rootSigBlob->GetBufferPointer() , rootSigBlob->GetBufferSize() ,
 														 IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(result));
 	rootSigBlob->Release();
@@ -256,7 +256,7 @@ void SpriteCommon::Initialize(DX12base* dx12base) {
 	pipelineDesc.pRootSignature = rootSignature_.Get();
 
 	//パイプラインステートの生成
-	result = dx12base_->GetDevice()->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState_));
+	result = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState_));
 	assert(SUCCEEDED(result));
 
 	//デスクリプタヒープの設定
@@ -266,7 +266,7 @@ void SpriteCommon::Initialize(DX12base* dx12base) {
 	srvHeapDesc.NumDescriptors = kMaxSRVCount;
 
 	//設定をもとにSRV用デスクリプタヒープを生成
-	result = dx12base->GetDevice()->CreateDescriptorHeap(
+	result = dxCommon->GetDevice()->CreateDescriptorHeap(
 		&srvHeapDesc ,
 		IID_PPV_ARGS(&srvHeap_)
 	);
@@ -281,11 +281,11 @@ void SpriteCommon::Initialize(DX12base* dx12base) {
 void SpriteCommon::PreDraw() {
 
 	//パイプラインステートとルートシグネチャの設定コマンド
-	dx12base_->GetCmdList()->SetPipelineState(pipelineState_.Get());
-	dx12base_->GetCmdList()->SetGraphicsRootSignature(rootSignature_.Get());
+	dxCommon_->GetCmdList()->SetPipelineState(pipelineState_.Get());
+	dxCommon_->GetCmdList()->SetGraphicsRootSignature(rootSignature_.Get());
 
 	// プリミティブ形状の設定コマンド
-	dx12base_->GetCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP); // 三角形リスト
+	dxCommon_->GetCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP); // 三角形リスト
 }
 
 UINT SpriteCommon::GetVerticesValue() {
@@ -296,8 +296,8 @@ D3D12_VERTEX_BUFFER_VIEW* SpriteCommon::GetVBView() {
 	return &vbView_;
 }
 
-DX12base* SpriteCommon::GetDX12Base() {
-	return dx12base_;
+DirectXCommon* SpriteCommon::GetDX12Base() {
+	return dxCommon_;
 }
 
 void SpriteCommon::Set2DCoordinateSystem(Matrix4& mat) {
@@ -372,7 +372,7 @@ void SpriteCommon::LoadTexture(uint32_t index , const std::string& fileName) {
 	textureResouceDesc.SampleDesc.Count = 1;
 
 	//テクスチャバッファの生成
-	result = dx12base_->GetDevice()->CreateCommittedResource(
+	result = dxCommon_->GetDevice()->CreateCommittedResource(
 		&textureHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&textureResouceDesc ,	//リソース設定
@@ -407,24 +407,24 @@ void SpriteCommon::LoadTexture(uint32_t index , const std::string& fileName) {
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;	//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = resDesc_.MipLevels;
 
-	incremantSize_ = dx12base_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	incremantSize_ = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	srvHandle_.ptr += incremantSize_ * index;
 
 	//ハンドルの指す位置にシェーダーリソースビュー作成
-	dx12base_->GetDevice()->CreateShaderResourceView(textureBuffers_[index].Get() , &srvDesc , srvHandle_);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureBuffers_[index].Get() , &srvDesc , srvHandle_);
 }
 
 void SpriteCommon::SetTextureCommands(uint32_t index) {
 	//SRVヒープの設定コマンド
-	dx12base_->GetCmdList()->SetDescriptorHeaps(1 , srvHeap_.GetAddressOf());
+	dxCommon_->GetCmdList()->SetDescriptorHeaps(1 , srvHeap_.GetAddressOf());
 
 	//SRVヒープの先頭ハンドルを取得(SRVを指しているはず)
 	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap_->GetGPUDescriptorHandleForHeapStart();
 
 	srvGpuHandle.ptr += incremantSize_ * index;
 
-	dx12base_->GetCmdList()->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
+	dxCommon_->GetCmdList()->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
 }
 
 ComPtr<ID3D12Resource> SpriteCommon::GetTextureBuffer(uint32_t index)const {

@@ -79,11 +79,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTex;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)DirectXTex;$(IncludePath);$(ProjectDir)Sprite;$(ProjectDir)Input;$(ProjectDir)Base;$(ProjectDir)3D;$(ProjectDir)math;$(ProjectDir)Scene;%(AdditionalIncludeDirectories)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTex;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)DirectXTex;$(IncludePath);$(ProjectDir)Sprite;$(ProjectDir)Input;$(ProjectDir)Base;$(ProjectDir)3D;$(ProjectDir)math;$(ProjectDir)Scene;%(AdditionalIncludeDirectories)</IncludePath>
     <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -120,7 +120,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Sprite;$(ProjectDir)Input;$(ProjectDir)Base;$(ProjectDir)3D;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,7 +136,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Sprite;$(ProjectDir)Input;$(ProjectDir)Base;$(ProjectDir)3D;$(ProjectDir)math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -146,7 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Base\DX12base.cpp" />
+    <ClCompile Include="Base\DirectXCommon.cpp" />
     <ClCompile Include="Base\main.cpp" />
     <ClCompile Include="Base\WinApp.cpp" />
     <ClCompile Include="Input\Input.cpp" />
@@ -156,6 +158,7 @@
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="math\Vector4.cpp" />
     <ClCompile Include="math\WorldTransform.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Sprite\Sprite.cpp" />
     <ClCompile Include="Sprite\SpriteCommon.cpp" />
   </ItemGroup>
@@ -165,7 +168,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Base\DX12base.h" />
+    <ClInclude Include="Base\DirectXCommon.h" />
     <ClInclude Include="Base\WinApp.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="math\MathFunc.h">
@@ -176,6 +179,7 @@
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="math\WorldTransform.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Sprite\Sprite.h" />
     <ClInclude Include="Sprite\SpriteCommon.h" />
   </ItemGroup>

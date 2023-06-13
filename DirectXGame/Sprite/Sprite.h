@@ -85,7 +85,7 @@ private:
 	//メンバ変数
 private:
 	//DirectX基礎
-	DX12base* dx12base_ = nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
 
 	//スプライト共通処理
 	SpriteCommon* spriteCommon_ = nullptr;;
