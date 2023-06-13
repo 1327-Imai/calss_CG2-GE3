@@ -80,83 +80,13 @@ int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR , _In_ int) 
 		//DirectX毎フレーム処理
 		//更新処理
 		input->Update();
-		if (input->TriggerKey(DIK_SPACE)) {
-			if (sprite->GetTextureIndex() == 0) {
-				sprite->SetTextureIndex(1);
-			}
-			else {
-				sprite->SetTextureIndex(0);
-			}
-		}
-
-		if (input->PushKey(DIK_RIGHT)) {
-			sprite->SetPosition(Vector2{sprite->GetPosition().x + 1 , sprite->GetPosition().y});
-		}
-		if (input->PushKey(DIK_LEFT)) {
-			sprite->SetPosition(Vector2{sprite->GetPosition().x - 1 , sprite->GetPosition().y});
-		}
-		if (input->PushKey(DIK_UP)) {
-			sprite->SetPosition(Vector2{sprite->GetPosition().x , sprite->GetPosition().y - 1});
-		}
-		if (input->PushKey(DIK_DOWN)) {
-			sprite->SetPosition(Vector2{sprite->GetPosition().x , sprite->GetPosition().y + 1});
-		}
-
-		if (input->PushKey(DIK_Q)) {
-			sprite->SetRotation(sprite->GetRotation() - MathFunc::Utility::Deg2Rad(1));
-		}
-		if (input->PushKey(DIK_W)) {
-			sprite->SetRotation(sprite->GetRotation() + MathFunc::Utility::Deg2Rad(1));
-		}
-
-		if (input->PushKey(DIK_A)) {
-			sprite->SetSize(Vector2{sprite->GetSize().x - 1.0f , sprite->GetSize().y});
-		}
-		if (input->PushKey(DIK_S)) {
-			sprite->SetSize(Vector2{sprite->GetSize().x + 1.0f , sprite->GetSize().y});
-		}
-		if (input->PushKey(DIK_Z)) {
-			sprite->SetSize(Vector2{sprite->GetSize().x , sprite->GetSize().y - 1.0f});
-		}
-		if (input->PushKey(DIK_X)) {
-			sprite->SetSize(Vector2{sprite->GetSize().x , sprite->GetSize().y + 1.0f});
-		}
-
-		if (input->TriggerKey(DIK_R)) {
-			if (sprite->GetIsFlipX() == false) {
-				sprite->SetIsFlipX(true);
-			}
-			else {
-				sprite->SetIsFlipX(false);
-			}
-		}
-
-		if (input->TriggerKey(DIK_F)) {
-			if (sprite->GetIsFlipY() == false) {
-				sprite->SetIsFlipY(true);
-			}
-			else {
-				sprite->SetIsFlipY(false);
-			}
-		}
-
-		if (input->TriggerKey(DIK_V)) {
-			if (sprite->GetIsVisible() == false) {
-				sprite->SetIsVisible(true);
-			}
-			else {
-				sprite->SetIsVisible(false);
-			}
-		}
-
-		sprite->Update();
+		
 
 		//描画処理
 		dx12base->PreDraw();
 
 		//スプライト描画
 		spriteCommon->PreDraw();
-		sprite->Draw();
 
 		dx12base->PostDraw();
 
