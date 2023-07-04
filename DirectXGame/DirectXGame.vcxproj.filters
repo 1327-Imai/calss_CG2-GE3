@@ -105,9 +105,6 @@
     <ClCompile Include="3D\Object3D.cpp">
       <Filter>source\3D</Filter>
     </ClCompile>
-    <ClCompile Include="3D\ViewProjection.cpp">
-      <Filter>source\3D</Filter>
-    </ClCompile>
     <ClCompile Include="3D\Model.cpp">
       <Filter>source\3D</Filter>
     </ClCompile>
@@ -119,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="Texture\Texture.cpp">
       <Filter>source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\Camera.cpp">
+      <Filter>source\3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +161,6 @@
     <ClInclude Include="Scene\GameScene.h">
       <Filter>header\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="3D\ViewProjection.h">
-      <Filter>header\3D</Filter>
-    </ClInclude>
     <ClInclude Include="3D\Model.h">
       <Filter>header\3D</Filter>
     </ClInclude>
@@ -175,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="Texture\Texture.h">
       <Filter>header\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\Camera.h">
+      <Filter>header\3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

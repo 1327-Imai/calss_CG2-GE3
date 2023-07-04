@@ -148,10 +148,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3D\Camera.cpp" />
     <ClCompile Include="3D\Model.cpp" />
     <ClCompile Include="3D\ModelManager.cpp" />
     <ClCompile Include="3D\Object3D.cpp" />
-    <ClCompile Include="3D\ViewProjection.cpp" />
     <ClCompile Include="Base\DirectXCommon.cpp" />
     <ClCompile Include="Base\main.cpp" />
     <ClCompile Include="Base\WinApp.cpp" />
@@ -174,10 +174,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3D\Camera.h" />
     <ClInclude Include="3D\Model.h" />
     <ClInclude Include="3D\ModelManager.h" />
     <ClInclude Include="3D\Object3D.h" />
-    <ClInclude Include="3D\ViewProjection.h" />
     <ClInclude Include="Base\DirectXCommon.h" />
     <ClInclude Include="Base\WinApp.h" />
     <ClInclude Include="Input\Input.h" />

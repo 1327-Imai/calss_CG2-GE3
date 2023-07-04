@@ -2,9 +2,9 @@
 #include "DirectXCommon.h"
 #include "MathFunc.h"
 #include "WorldTransform.h"
-#include "ViewProjection.h"
 #include "Model.h"
 #include "Texture.h"
+#include "Camera.h"
 
 class Object3D
 {
@@ -15,20 +15,23 @@ public:
 	//デストラクタ
 	~Object3D();
 
-public://静的メンバ関数
-	static void StaticInitialize(DirectXCommon* dxCommon , ViewProjection* viewProjection);
+	//静的メンバ関数
+public:
+	static void StaticInitialize(DirectXCommon* dxCommon , Camera* camera);
 
+	static void SetCamera(Camera* camera) {
+		Object3D::camera_ = camera;
+	}
+
+private:
 	static void CreateGraphicsPipeline();
 
 	//アクセッサ
 	static void SetDevice(ID3D12Device* device) {
-		Object3D::device = device;
+		Object3D::device_ = device;
 	}
 	static void SetCmdList(ID3D12GraphicsCommandList* cmdList) {
-		Object3D::cmdList = cmdList;
-	}
-	static void SetViewProjection(ViewProjection* viewProjection) {
-		Object3D::viewProjection = viewProjection;
+		Object3D::cmdList_ = cmdList;
 	}
 
 	//メンバ関数
@@ -46,33 +49,33 @@ public:
 
 	//アクセッサ
 	void SetModel(Model* model) {
-		this->model = model;
+		model_ = model;
 	}
 
 	void SetPosition(Vector3 position) {
-		worldTransform.translation_ = position;
+		worldTransform_.translation_ = position;
 	}
 	Vector3 GetPosition() const {
 		Vector3 pos = {
-			worldTransform.matWorld_.m[3][0] ,
-			worldTransform.matWorld_.m[3][1] ,
-			worldTransform.matWorld_.m[3][2]
+			worldTransform_.matWorld_.m[3][0] ,
+			worldTransform_.matWorld_.m[3][1] ,
+			worldTransform_.matWorld_.m[3][2]
 		};
 		return pos;
 	}
 
 	void SetRotation(Vector3 rotation) {
-		worldTransform.rotation_ = rotation;
+		worldTransform_.rotation_ = rotation;
 	}
 	Vector3 GetRotation() {
-		return worldTransform.rotation_;
+		return worldTransform_.rotation_;
 	}
 
 	void SetScale(Vector3 scale) {
-		worldTransform.scale_ = scale;
+		worldTransform_.scale_ = scale;
 	}
 	Vector3 GetScale() {
-		return worldTransform.scale_;
+		return worldTransform_.scale_;
 	}
 
 
@@ -98,34 +101,34 @@ private:
 
 private:
 	//デバイス
-	static ID3D12Device* device;
+	static ID3D12Device* device_;
 	//コマンドリスト
-	static ID3D12GraphicsCommandList* cmdList;
+	static ID3D12GraphicsCommandList* cmdList_;
 	//ルートシグネチャ
-	static ComPtr<ID3D12RootSignature> rootSignature;
+	static ComPtr<ID3D12RootSignature> rootSignature_;
 	//パイプラインステート
-	static ComPtr<ID3D12PipelineState> pipelineState;
-	//ビュープロジェクション
-	static ViewProjection* viewProjection;
+	static ComPtr<ID3D12PipelineState> pipelineState_;
+	//カメラ
+	static Camera* camera_;
+
 
 private:
 	//定数バッファ(行列用)
-	ComPtr<ID3D12Resource> constBufferTransform = nullptr;
+	ComPtr<ID3D12Resource> constBufferTransform_ = nullptr;
 	//定数バッファ(マテリアル)
-	ComPtr<ID3D12Resource> constBufferMaterial = nullptr;
+	ComPtr<ID3D12Resource> constBufferMaterial_ = nullptr;
 
 	//SRV用デスクリプタヒープ
-	ComPtr<ID3D12DescriptorHeap> srvHeap;
-
+	ComPtr<ID3D12DescriptorHeap> srvHeap_;
 	//SRVヒープの先頭ハンドル
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle_;
 
 	//ワールド変換
-	WorldTransform worldTransform;
+	WorldTransform worldTransform_;
 	//モデル
-	Model* model;
+	Model* model_;
 	//テクスチャ
-	Texture* texture;
+	Texture* texture_;
 
 };
 

@@ -233,16 +233,15 @@ Vector3  MathFunc::Utility::MulVector3AndMatrix4(Vector3 vec , Matrix4 mat) {
 
 Matrix4 MathFunc::Utility::PerspectiveFovLH(float fovAngleY , float aspectRatio , float nearZ , float farZ) {
 
-	float h = 1 / tan(fovAngleY * 0.5);
-	float w = h / aspectRatio;
-	float a = farZ / (farZ - nearZ);
-	float b = (-nearZ * farZ) / (farZ - nearZ);
+	float viewHeight = 1 / tan(fovAngleY * 0.5);
+	float viewWidth = viewHeight / aspectRatio;
+	float fRange = farZ / (farZ - nearZ);
 
 	Matrix4 perspectiveFovLH = {
-		w , 0 , 0 , 0 ,
-		0 , h , 0 , 0 ,
-		0 , 0 , a , 1 ,
-		0 , 0 , b , 0
+		viewWidth , 0 , 0 , 0 ,
+		0 , viewHeight , 0 , 0 ,
+		0 , 0 , fRange , 1 ,
+		0 , 0 , -fRange * nearZ , 0
 	};
 
 

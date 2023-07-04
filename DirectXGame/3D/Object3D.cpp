@@ -1,10 +1,10 @@
 #include "Object3D.h"
 
-ID3D12Device* Object3D::device = nullptr;
-ID3D12GraphicsCommandList* Object3D::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> Object3D::rootSignature;
-ComPtr<ID3D12PipelineState> Object3D::pipelineState;
-ViewProjection* Object3D::viewProjection = nullptr;
+ID3D12Device* Object3D::device_ = nullptr;
+ID3D12GraphicsCommandList* Object3D::cmdList_ = nullptr;
+ComPtr<ID3D12RootSignature> Object3D::rootSignature_;
+ComPtr<ID3D12PipelineState> Object3D::pipelineState_;
+Camera* Object3D::camera_ = nullptr;
 
 Object3D::Object3D() {
 }
@@ -206,26 +206,26 @@ void Object3D::CreateGraphicsPipeline() {
 		&errorBlob);
 	assert(SUCCEEDED(result));
 
-	result = device->CreateRootSignature(
+	result = device_->CreateRootSignature(
 		0 ,
 		rootSigBlob->GetBufferPointer() ,
 		rootSigBlob->GetBufferSize() ,
-		IID_PPV_ARGS(&rootSignature));
+		IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(result));
 
 	//パイプラインにルートシグネチャをセット
-	pipelineDesc.pRootSignature = rootSignature.Get();
+	pipelineDesc.pRootSignature = rootSignature_.Get();
 
 	//パイプラインステートの生成
-	result = device->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState));
+	result = device_->CreateGraphicsPipelineState(&pipelineDesc , IID_PPV_ARGS(&pipelineState_));
 	assert(SUCCEEDED(result));
 
 }
 
-void Object3D::StaticInitialize(DirectXCommon* dxCommon , ViewProjection* viewProjection){
+void Object3D::StaticInitialize(DirectXCommon* dxCommon , Camera* camera){
 	SetDevice(dxCommon->GetDevice());
 	SetCmdList(dxCommon->GetCmdList());
-	SetViewProjection(viewProjection);
+	SetCamera(camera);
 	CreateGraphicsPipeline();
 }
 
@@ -234,13 +234,13 @@ void Object3D::Initialize() {
 	CreateConstBufferTransform();
 	CreateConstBufferMaterial();
 
-	worldTransform.initialize();
+	worldTransform_.initialize();
 
 }
 
 void Object3D::Update() {
 
-	worldTransform.UpdateMatWorld();
+	worldTransform_.UpdateMatWorld();
 
 	UpdateConstBufferTransform();
 
@@ -248,30 +248,30 @@ void Object3D::Update() {
 
 void Object3D::Draw() {
 	//パイプラインステートの設定
-	cmdList->SetPipelineState(pipelineState.Get());
+	cmdList_->SetPipelineState(pipelineState_.Get());
 	//ルートシグネチャの設定
-	cmdList->SetGraphicsRootSignature(rootSignature.Get());
+	cmdList_->SetGraphicsRootSignature(rootSignature_.Get());
 	//プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmdList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//定数バッファビュー(CBV)の設定コマンド
-	cmdList->SetGraphicsRootConstantBufferView(0 , constBufferMaterial->GetGPUVirtualAddress());
-	cmdList->SetGraphicsRootConstantBufferView(2 , constBufferTransform->GetGPUVirtualAddress());
+	cmdList_->SetGraphicsRootConstantBufferView(0 , constBufferMaterial_->GetGPUVirtualAddress());
+	cmdList_->SetGraphicsRootConstantBufferView(2 , constBufferTransform_->GetGPUVirtualAddress());
 
 	//テクスチャ描画
-	if (texture) {
-		texture->Draw(srvHeap);
+	if (texture_) {
+		texture_->Draw(srvHeap_);
 	}
 
 	//モデル描画
-	if (model) {
-		model->Draw();
+	if (model_) {
+		model_->Draw();
 	}
 
 }
 
 void Object3D::SetTexture(Texture* texture) {
-	this->texture = texture;
-	texture->SetSRV(srvHeap , srvHandle , model->GetResDesc());
+	texture_ = texture;
+	texture_->SetSRV(srvHeap_ , srvHandle_ , model_->GetResDesc());
 }
 
 void Object3D::CreateConstBufferTransform() {
@@ -293,13 +293,13 @@ void Object3D::CreateConstBufferTransform() {
 	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//定数バッファの生成
-	result = device->CreateCommittedResource(
+	result = device_->CreateCommittedResource(
 		&cbHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&cbResourceDesc ,	//リソース設定
 		D3D12_RESOURCE_STATE_GENERIC_READ ,
 		nullptr ,
-		IID_PPV_ARGS(&constBufferTransform)
+		IID_PPV_ARGS(&constBufferTransform_)
 	);
 	assert(SUCCEEDED(result));
 
@@ -324,19 +324,19 @@ void Object3D::CreateConstBufferMaterial() {
 	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//定数バッファの生成
-	result = device->CreateCommittedResource(
+	result = device_->CreateCommittedResource(
 		&cbHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&cbResourceDesc ,	//リソース設定
 		D3D12_RESOURCE_STATE_GENERIC_READ ,
 		nullptr ,
-		IID_PPV_ARGS(&constBufferMaterial)
+		IID_PPV_ARGS(&constBufferMaterial_)
 	);
 	assert(SUCCEEDED(result));
 
 	//定数バッファのマッピング
 	ConstBufferDataMaterial* constMapMaterial = nullptr;
-	result = constBufferMaterial->Map(0 , nullptr , (void**)&constMapMaterial); // マッピング
+	result = constBufferMaterial_->Map(0 , nullptr , (void**)&constMapMaterial); // マッピング
 	assert(SUCCEEDED(result));
 
 	//定数バッファへのデータ転送
@@ -348,21 +348,15 @@ void Object3D::UpdateConstBufferTransform() {
 	HRESULT result;
 	//定数バッファへデータ転送
 	ConstBufferDataTransform* constMap = nullptr;
-	result = constBufferTransform->Map(0 , nullptr , (void**)&constMap);
+	result = constBufferTransform_->Map(0 , nullptr , (void**)&constMap);
 
 	if (SUCCEEDED(result)) {
 
-		Matrix4 matProjection = MathFunc::Utility::PerspectiveFovLH (
-			MathFunc::Utility::Deg2Rad(45.0f) ,
-			(float)WinApp::WINDOW_WIDTH / WinApp::WINDOW_HEIGHT,
-			0.1f , 1000.0f
-		);
-
 		//定数バッファへデータ転送
-		constMap->mat = worldTransform.matWorld_;
-		constMap->mat *= viewProjection->matView;
-		constMap->mat *= matProjection;
-		constBufferTransform->Unmap(0 , nullptr);
+		constMap->mat = worldTransform_.matWorld_;
+		constMap->mat *= camera_->GetMatView();
+		constMap->mat *= camera_->GetMatProjection();
+		constBufferTransform_->Unmap(0 , nullptr);
 	}
 
 }

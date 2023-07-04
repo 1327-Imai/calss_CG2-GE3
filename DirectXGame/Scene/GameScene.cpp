@@ -10,7 +10,7 @@ GameScene::~GameScene() {
 	delete input_;
 	delete sprite_;
 	delete spriteCommon_;
-	delete viewProjection_;
+	delete camera_;
 	delete object_;
 	modelManager_->Finalize();
 	textureManager_->Finalize();
@@ -27,13 +27,13 @@ void GameScene::Initialize(WinApp* winApp , DirectXCommon* dxCommon) {
 	
 	//テクスチャマネージャー
 	textureManager_ = TextureManager::Create(dxCommon);
-	
-	//ビュープロジェクション初期化
-	viewProjection_ = new ViewProjection;
-	viewProjection_->Initialize();
+
+	//カメラ初期化
+	camera_ = new Camera;
+	camera_->Initialize();
 
 	//3Dオブジェクト共通処理
-	Object3D::StaticInitialize(dxCommon,viewProjection_);
+	Object3D::StaticInitialize(dxCommon,camera_);
 
 	// キーボードデバイスの生成
 	input_ = new Input();
@@ -59,6 +59,7 @@ void GameScene::Initialize(WinApp* winApp , DirectXCommon* dxCommon) {
 	object_->SetModel(modelManager_->CallModel("cube"));
 	object_->SetTexture(textureManager_->CallTexture("white1x1"));
 
+	pos = {0 , 0 , -10};
 	rotation = {0 , 0 , 0};
 
 }
@@ -69,19 +70,40 @@ void GameScene::Update() {
 	//更新処理
 	input_->Update();
 
+
 	if (input_->PushKey(DIK_D)) {
-		rotation.y -= MathFunc::Utility::Deg2Rad(1);
+		pos.x += MathFunc::Utility::Deg2Rad(5);
 	}
 	if (input_->PushKey(DIK_A)) {
-		rotation.y += MathFunc::Utility::Deg2Rad(1);
+		pos.x -= MathFunc::Utility::Deg2Rad(5);
 	}
-
 	if (input_->PushKey(DIK_W)) {
-		rotation.x += MathFunc::Utility::Deg2Rad(1);
+		pos.y += MathFunc::Utility::Deg2Rad(5);
 	}
 	if (input_->PushKey(DIK_S)) {
-		rotation.x -= MathFunc::Utility::Deg2Rad(1);
+		pos.y -= MathFunc::Utility::Deg2Rad(5);
 	}
+
+	if (input_->PushKey(DIK_UP)) {
+		rotation.x += MathFunc::Utility::Deg2Rad(30);
+	}
+	if (input_->PushKey(DIK_DOWN)) {
+		rotation.x -= MathFunc::Utility::Deg2Rad(30);
+	}
+	if (input_->PushKey(DIK_LEFT)) {
+		rotation.y -= MathFunc::Utility::Deg2Rad(30);
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
+		rotation.y += MathFunc::Utility::Deg2Rad(30);
+	}
+	if (input_->PushKey(DIK_X)) {
+		rotation.z += MathFunc::Utility::Deg2Rad(30);
+	}
+
+	camera_->SetPosition(pos);
+	camera_->SetRotation(rotation);
+
+	camera_->Update();
 
 	if (input_->PushKey(DIK_SPACE)) {
 		object_->SetTexture(textureManager_->CallTexture("cube"));
@@ -92,7 +114,7 @@ void GameScene::Update() {
 		sprite_->SetTexture(textureManager_->CallTexture("texture"));
 	}
 
-	object_->SetRotation(rotation);
+
 
 	object_->Update();
 	sprite_->Update();

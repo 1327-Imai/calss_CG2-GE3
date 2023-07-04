@@ -3,9 +3,9 @@
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "Object3D.h"
-#include "ViewProjection.h"
 #include "ModelManager.h"
 #include "TextureManager.h"
+#include "Camera.h"
 
 class GameScene{
 public:
@@ -33,12 +33,13 @@ private:
 	ModelManager* modelManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 
-	ViewProjection* viewProjection_ = nullptr;
+	Camera* camera_ = nullptr;
 
 	Sprite* sprite_ = nullptr;
 
 	Object3D* object_ = nullptr;
 
+	Vector3 pos;
 	Vector3 rotation;
 
 };
