@@ -50,9 +50,13 @@ private:
 
 public:
 	//アクセッサ
-	ComPtr<ID3D12GraphicsCommandList> GetCmdList();
+	ID3D12GraphicsCommandList* GetCmdList(){
+		return commandList_.Get();
+	}
 
-	ComPtr<ID3D12Device> GetDevice();
+	ID3D12Device* GetDevice() {
+		return device_.Get();
+	}
 
 	//メンバ変数
 private:
