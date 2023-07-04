@@ -52,6 +52,8 @@ void GameScene::Initialize(WinApp* winApp , DirectXCommon* dxCommon) {
 	//スプライト初期化
 	sprite_ = new Sprite;
 	sprite_->Initialize(spriteCommon_ , textureManager_->CallTexture("texture"));
+	sprite_->SetPosition({100,100});
+	sprite_->SetTextureSize(sprite_->GetTextureSize()/2);
 
 	//3Dモデル初期化
 	object_ = new Object3D;

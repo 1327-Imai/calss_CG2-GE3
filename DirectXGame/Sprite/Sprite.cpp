@@ -223,11 +223,9 @@ void Sprite::CreateConstMapMaterial() {
 void Sprite::SetTexture(Texture* texture) {
 	texture_ = texture;
 	texture_->SetSRV(srvHeap , srvHandle , spriteCommon_->GetResDesc());
-	AdujustTextureSize();
 }
 
 void Sprite::AdujustTextureSize() {
-
 	textureSize_.x = static_cast<float>(texture_->GetResDesc().Width);
 	textureSize_.y = static_cast<float>(texture_->GetResDesc().Height);
 }

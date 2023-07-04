@@ -92,13 +92,13 @@ public:
 		return textureSize_;
 	}
 
+	void AdujustTextureSize();
 
 private:
 	void CreateConstMapTransform();
 
 	void CreateConstMapMaterial();
 
-	void AdujustTextureSize();
 
 	//ç\ë¢ëÃ
 private:
