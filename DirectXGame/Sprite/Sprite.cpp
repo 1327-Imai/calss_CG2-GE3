@@ -10,13 +10,13 @@ Sprite::~Sprite() {
 }
 
 //メンバ関数
-void Sprite::Initialize(SpriteCommon* spriteCommon , uint32_t textureIndex) {
+void Sprite::Initialize(SpriteCommon* spriteCommon , Texture* texture) {
 
 	//スプライト共通処理
 	spriteCommon_ = spriteCommon;
 
 	//DirectX基礎
-	dxCommon_ = spriteCommon_->GetDX12Base();
+	dxCommon_ = spriteCommon_->GetDxCommon();
 
 	HRESULT result;
 
@@ -33,13 +33,16 @@ void Sprite::Initialize(SpriteCommon* spriteCommon , uint32_t textureIndex) {
 	}
 	//繋がりを解除
 	spriteCommon_->GetVertBuff()->Unmap(0 , nullptr);
+	
+	if (texture) {
+		texture_ = texture;
 
-	if (textureIndex != UINT32_MAX) {
-		textureIndex_ = textureIndex;
+		texture_->SetSRV(srvHeap , srvHandle , spriteCommon_->GetResDesc());
+
 		AdujustTextureSize();
-
 		size_ = textureSize_;
 	}
+
 	//ワールド変換
 	worldTransform_.initialize();
 	//2D座標系を適用
@@ -77,15 +80,12 @@ void Sprite::Update() {
 	vertices_[LT].pos = {left , top , 0.0f};
 	vertices_[RT].pos = {right , top , 0.0f};
 
-	ComPtr<ID3D12Resource> textureBuffer = spriteCommon_->GetTextureBuffer(textureIndex_);
+	if (texture_) {
 
-	if (textureBuffer) {
-		D3D12_RESOURCE_DESC resDesc = textureBuffer.Get()->GetDesc();
-
-		float tex_left = textureleftTop_.x / resDesc.Width;
-		float tex_right = textureleftTop_.x + textureSize_.x / resDesc.Width;
-		float tex_top = textureleftTop_.y / resDesc.Height;
-		float tex_bottom = textureleftTop_.y + textureSize_.y / resDesc.Height;
+		float tex_left = textureleftTop_.x / texture_->GetResDesc().Width;
+		float tex_right = textureleftTop_.x + textureSize_.x / texture_->GetResDesc().Width;
+		float tex_top = textureleftTop_.y / texture_->GetResDesc().Height;
+		float tex_bottom = textureleftTop_.y + textureSize_.y / texture_->GetResDesc().Height;
 
 		vertices_[LB].uv = {tex_left , tex_bottom};
 		vertices_[LT].uv = {tex_left , tex_top};
@@ -133,7 +133,9 @@ void Sprite::Draw() {
 	//定数バッファ―ビューをセットするコマンド
 	dxCommon_->GetCmdList()->SetGraphicsRootConstantBufferView(0 , constBuffMaterial_->GetGPUVirtualAddress());
 
-	spriteCommon_->SetTextureCommands(textureIndex_);
+	//spriteCommon_->SetTextureCommands(textureIndex_);
+
+	texture_->Draw(srvHeap);
 
 	//定数バッファビュー(CBV)の設定コマンド
 	dxCommon_->GetCmdList()->SetGraphicsRootConstantBufferView(2 , constBuffTransform_->GetGPUVirtualAddress());
@@ -218,89 +220,14 @@ void Sprite::CreateConstMapMaterial() {
 
 }
 
-void Sprite::SetPosition(const Vector2 position) {
-	position_ = position;
-}
-Vector2 Sprite::GetPosition() const {
-	return position_;
-}
-
-void Sprite::SetRotation(float rotation) {
-	rotation_ = rotation;
-}
-float Sprite::GetRotation() const {
-	return rotation_;
-}
-
-void Sprite::SetScale(const Vector2 scale) {
-	scale_ = scale;
-}
-Vector2 Sprite::GetScale() const {
-	return scale_;
-}
-
-void Sprite::SetSize(const Vector2 size) {
-	size_ = size;
-}
-Vector2 Sprite::GetSize() const {
-	return size_;
-}
-
-void Sprite::SetAnchorPoint(const Vector2 anchorPoint) {
-	anchorPoint_ = anchorPoint;
-}
-Vector2 Sprite::GetAnchorPoint() const {
-	return anchorPoint_;
-}
-
-void Sprite::SetColor(Vector4 color) {
-	color_ = color;
-}
-Vector4 Sprite::GetColor() const {
-	return color_;
-}
-
-void Sprite::SetIsFlipX(bool isFlipX) {
-	isFlipX_ = isFlipX;
-}
-bool Sprite::GetIsFlipX() const {
-	return isFlipX_;
-}
-
-void Sprite::SetIsFlipY(bool isFlipY) {
-	isFlipY_ = isFlipY;
-}
-bool Sprite::GetIsFlipY() const {
-	return isFlipY_;
-}
-
-void Sprite::SetIsVisible(bool isVisible) {
-	isVisible_ = isVisible;
-}
-bool Sprite::GetIsVisible() const {
-	return isVisible_;
-}
-
-void Sprite::SetTextureIndex(uint32_t textureIndex) {
-	textureIndex_ = textureIndex;
-}
-uint32_t Sprite::GetTextureIndex() {
-	return textureIndex_;
-}
-
-void Sprite::setTextureSize(Vector2 textureSize) {
-	textureSize_ = textureSize;
-}
-Vector2 Sprite::GetTextureSize() {
-	return textureSize_;
+void Sprite::SetTexture(Texture* texture) {
+	texture_ = texture;
+	texture_->SetSRV(srvHeap , srvHandle , spriteCommon_->GetResDesc());
+	AdujustTextureSize();
 }
 
 void Sprite::AdujustTextureSize() {
-	ComPtr<ID3D12Resource> textureBuffer = spriteCommon_->GetTextureBuffer(textureIndex_);
-	assert(textureBuffer);
 
-	D3D12_RESOURCE_DESC resDesc = textureBuffer.Get()->GetDesc();
-
-	textureSize_.x = static_cast<float>(resDesc.Width);
-	textureSize_.y = static_cast<float>(resDesc.Height);
+	textureSize_.x = static_cast<float>(texture_->GetResDesc().Width);
+	textureSize_.y = static_cast<float>(texture_->GetResDesc().Height);
 }

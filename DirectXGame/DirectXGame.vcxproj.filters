@@ -49,6 +49,18 @@
     <Filter Include="source\Scene">
       <UniqueIdentifier>{bde4d532-f041-41e7-8957-e24b35c64f37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\3D">
+      <UniqueIdentifier>{c2428435-16a1-49de-b27b-e14c98f4d727}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\3D">
+      <UniqueIdentifier>{5e94fc18-8da3-4baa-877a-00d97b6a3b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\Texture">
+      <UniqueIdentifier>{20c27ee1-f864-4ab5-846c-12cf8e4a0a99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Texture">
+      <UniqueIdentifier>{65faf79c-1564-4947-84a7-af5bfe166a7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math\MathFunc.cpp">
@@ -90,6 +102,24 @@
     <ClCompile Include="Scene\GameScene.cpp">
       <Filter>source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="3D\Object3D.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\ViewProjection.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\Model.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\ModelManager.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\TextureManager.cpp">
+      <Filter>source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp">
+      <Filter>source\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\MathFunc.h">
@@ -125,8 +155,26 @@
     <ClInclude Include="Sprite\SpriteCommon.h">
       <Filter>header\Sprite</Filter>
     </ClInclude>
+    <ClInclude Include="3D\Object3D.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
     <ClInclude Include="Scene\GameScene.h">
-      <Filter>header</Filter>
+      <Filter>header\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\ViewProjection.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\Model.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\ModelManager.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\TextureManager.h">
+      <Filter>header\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\Texture.h">
+      <Filter>header\Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,107 +1,87 @@
 #pragma once
-#include <d3d12.h>
+#include "DirectXCommon.h"
+#include "MathFunc.h"
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <DirectXmath.h>
-#include <d3dcompiler.h>
 
-#include<wrl.h>
-
-#include "DX12base.h"
-
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"d3dcompiler")
-
-#include <string.h>
-#include <unordered_map>
-using namespace Microsoft::WRL;
-using namespace DirectX;
-
-//class DX12base;
-
-class Model{
+class Model
+{
 public:
+	//コンストラクタ
+	Model();
+
+	//デストラクタ
+	~Model();
+private://エイリアス
+	//stdを省略
+	using string = std::string;
+
+public://定数
+	//モデル格納ルートパス
+	static const string baseDirectory;
+
+public:
+	//静的メンバ関数
+	//アクセッサ
+	static void SetDevice(ID3D12Device* device) {
+		Model::device = device;
+	}
+	static void SetCmdList(ID3D12GraphicsCommandList* cmdList) {
+		Model::cmdList = cmdList;
+	}
+
 	//メンバ関数
-	void LoadModel();
-	void LoadModel(const char* fileName, bool smoothing = false);
+public:
+	//初期化
+	void LoadModel(const string& modelName);
 
-	void Initialize();
-
+	//描画
 	void Draw();
 
+	//モデル名取得
+	string GetModelName() {
+		return modelName;
+	}
 
-	// エッジ平滑化データの追加
-	void AddSmoothData(unsigned short indexPosition, unsigned short indexVertex);
+	D3D12_RESOURCE_DESC GetResDesc() {
+		return resDesc;
+	}
 
-	// 平滑化された頂点法線の計算
-	void CalculateSmoothedVertexNormals();
-private:
-
-
-public:
-	//アクセッサ
-	D3D12_RESOURCE_DESC GetResDesc();
-
-	D3D12_VERTEX_BUFFER_VIEW GetVbView();
-
-	D3D12_INDEX_BUFFER_VIEW GetIbView();
-
-	// 頂点データの数を取得
-	inline size_t GetVertexCount() { return vertices.size(); }
-private:
 	//構造体
-	struct Vertex {
-		XMFLOAT3 pos;	//xyz座標
-		XMFLOAT3 normal;	//法線ベクトル
-		XMFLOAT2 uv;	//uv座標
+private:
+	struct VertexPosNormalUv {
+		Vector3 pos;	//xyz座標
+		Vector3 normal;	//法線ベクトル
+		Vector2 uv;	//uv座標
 	};
 
+	//静的メンバ変数
+private:
+	//デバイス
+	static ID3D12Device* device;
+	//コマンドリスト
+	static ID3D12GraphicsCommandList* cmdList;
+
 	//メンバ変数
-	//result
-	HRESULT result;
-
-	//dierectX12の基礎設定
-	DX12base& dx12base = DX12base::GetInstance();
-
-	//モデルのファイル形式
-	char fileType[5]={0};
-
-	// 頂点データ配列
-	std::vector<Vertex> vertices;
-	// 頂点インデックス配列
-	std::vector<unsigned short> indices;
-
-	//頂点データ全体のサイズ
-	UINT sizeVB;
-
-	//インデックスデータ全体のサイズ
-	UINT sizeIB;
-
+private:
+	//頂点
+	std::vector<VertexPosNormalUv> vertices;
+	//頂点バッファ
+	ComPtr<ID3D12Resource> vertBuff = nullptr;
+	//頂点バッファビュー
+	D3D12_VERTEX_BUFFER_VIEW vbView;
+	//インデックス
+	std::vector<uint16_t> indices;
+	//インデックスバッファ
+	ComPtr<ID3D12Resource> indexBuff = nullptr;
+	//インデックスバッファビュー
+	D3D12_INDEX_BUFFER_VIEW ibView;
 	//リソース設定
 	D3D12_RESOURCE_DESC resDesc;
 
-	//頂点バッファの生成
-	ComPtr<ID3D12Resource> vertBuff = nullptr;
+	//モデル名
+	string modelName;
 
-	//インデックスバッファの生成
-	ComPtr<ID3D12Resource> indexBuff = nullptr;
-
-	//GPU上のバッファのマップ
-	Vertex* vertMap = nullptr;
-
-	//インデックスバッファのマップ
-	uint16_t* indexMap = nullptr;
-
-	//頂点バッファビューの作成
-	D3D12_VERTEX_BUFFER_VIEW vbView;
-
-	//インデックスバッファビューの作成
-	D3D12_INDEX_BUFFER_VIEW ibView;
-
-	// 頂点法線スムージング用データ
-	std::unordered_map<unsigned short, std::vector<unsigned short>>smoothData;
 };
 

@@ -1,38 +1,59 @@
 #pragma once
-#pragma once
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <wrl.h>
-
-#include <cassert>
-#include <vector>
-
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-
-#include "WinApp.h"
-#include "DX12base.h"
-
-#include <DirectXTex.h>
+#include "DirectXCommon.h"
+#include "DirectXTex.h"
+#include "Model.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-class Model;
-//class DX12base;
-
 class Texture {
+private:
+	using string = std::string;
+
+public:
+	//コンストラクタ
+	Texture();
+
+	//デストラクタ
+	~Texture();
+
+	//静的メンバ関数
+	//アクセッサ
+	static void SetDevice(ID3D12Device* device) {
+		Texture::device = device;
+	}
+	static void SetCmdList(ID3D12GraphicsCommandList* cmdList) {
+		Texture::cmdList = cmdList;
+	}
 
 	//メンバ関数
 public:
-	void LoadTexture(const wchar_t* fileName);
+	void LoadTexture(const string& fileName);
 
-	void CreateSRV();
+	//void CreateSRV(Model* model);
 
-	void Draw();
+	void SetSRV(ComPtr<ID3D12DescriptorHeap>& srvHeap, D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle, D3D12_RESOURCE_DESC resDesc);
+
+	void Draw(ComPtr<ID3D12DescriptorHeap> srvHeap);
 
 	//アクセッサ
-	void SetModel(Model* model);
+	string GetTextureName() {
+		return textureName;
+	}
+
+	D3D12_RESOURCE_DESC GetResDesc() {
+		return textureResouceDesc;
+	}
+
+private:
+	//静的メンバ変数
+	//デバイス
+	static ID3D12Device* device;
+	//コマンドリスト
+	static ID3D12GraphicsCommandList* cmdList;
+
+	//テクスチャ格納ルートパス
+	static const string baseDirectory;
 
 	//メンバ変数
 private:
@@ -55,22 +76,12 @@ private:
 	//デスクリプタヒープの設定
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
-	//設定をもとにSRV用デスクリプタヒープを生成
-	ComPtr<ID3D12DescriptorHeap> srvHeap;
-
-	//SRVヒープの先頭ハンドルを取得
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
-
 	//シェーダーリソースビュー設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 
 	//SRVの最大個数
 	const size_t kMaxSRVCount = 2056;
 
-	//DirectX基礎部分
-	DX12base& dx12base =DX12base::GetInstance();
-
-	//モデル
-	Model* model;
+	string textureName;
 
 };

@@ -334,12 +334,3 @@ void DirectXCommon::UpdateFixFPS() {
 	reference_ = std::chrono::steady_clock::now();
 
 }
-
-//アクセッサ
-ComPtr<ID3D12GraphicsCommandList> DirectXCommon::GetCmdList() {
-	return commandList_.Get();
-}
-
-ComPtr<ID3D12Device> DirectXCommon::GetDevice() {
-	return device_.Get();
-}

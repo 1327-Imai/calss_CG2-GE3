@@ -1,6 +1,7 @@
 #pragma once
 #include "SpriteCommon.h"
 #include "WorldTransform.h"
+#include "Texture.h"
 
 class Sprite {
 public:
@@ -12,44 +13,85 @@ public:
 	~Sprite();
 
 	//メンバ関数
-	void Initialize(SpriteCommon* spriteCommon,uint32_t textureIndex = UINT32_MAX);
+	void Initialize(SpriteCommon* spriteCommon, Texture* texture);
 
 	void Update();
 
 	void Draw();
 
-	void SetPosition(const Vector2 position);
-	Vector2 GetPosition() const;
+	void SetTexture(Texture* texture);
 
-	void SetRotation(float rotation);
-	float GetRotation() const;
+	//アクセッサ
+	void SetPosition(const Vector2 position) {
+		position_ = position;
+	}
+	Vector2 GetPosition() const {
+		return position_;
+	}
 
-	void SetSize(const Vector2 size);
-	Vector2 GetSize() const;
+	void SetRotation(float rotation) {
+		rotation_ = rotation;
+	}
+	float GetRotation() const {
+		return rotation_;
+	}
 
-	void SetScale(const Vector2 scale);
-	Vector2 GetScale() const;
+	void SetScale(const Vector2 scale) {
+		scale_ = scale;
+	}
+	Vector2 GetScale() const {
+		return scale_;
+	}
 
-	void SetAnchorPoint(const Vector2 anchorPoint);
-	Vector2 GetAnchorPoint() const;
+	void SetSize(const Vector2 size) {
+		size_ = size;
+	}
+	Vector2 GetSize() const {
+		return size_;
+	}
 
-	void SetColor(Vector4 color);
-	Vector4 GetColor() const;
+	void SetAnchorPoint(const Vector2 anchorPoint) {
+		anchorPoint_ = anchorPoint;
+	}
+	Vector2 GetAnchorPoint() const {
+		return anchorPoint_;
+	}
 
-	void SetIsFlipX(bool isFlipX);
-	bool GetIsFlipX() const;
+	void SetColor(Vector4 color) {
+		color_ = color;
+	}
+	Vector4 GetColor() const {
+		return color_;
+	}
 
-	void SetIsFlipY(bool isFlipY);
-	bool GetIsFlipY() const;
+	void SetIsFlipX(bool isFlipX) {
+		isFlipX_ = isFlipX;
+	}
+	bool GetIsFlipX() const {
+		return isFlipX_;
+	}
 
-	void SetIsVisible(bool isVisible);
-	bool GetIsVisible() const;
+	void SetIsFlipY(bool isFlipY) {
+		isFlipY_ = isFlipY;
+	}
+	bool GetIsFlipY() const {
+		return isFlipY_;
+	}
 
-	void SetTextureIndex(uint32_t textureIndex);
-	uint32_t GetTextureIndex();
+	void SetIsVisible(bool isVisible) {
+		isVisible_ = isVisible;
+	}
+	bool GetIsVisible() const {
+		return isVisible_;
+	}
 
-	void setTextureSize(Vector2 textureSize);
-	Vector2 GetTextureSize();
+	void SetTextureSize(Vector2 textureSize) {
+		textureSize_ = textureSize;
+	}
+	Vector2 GetTextureSize() {
+		return textureSize_;
+	}
+
 
 private:
 	void CreateConstMapTransform();
@@ -104,8 +146,11 @@ private:
 	//
 	ComPtr<ID3D12Resource> constBuffTransform_ = nullptr;
 
-	//テクスチャインデックス
-	uint32_t textureIndex_;
+	//SRV用デスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> srvHeap;
+
+	//SRVヒープの先頭ハンドル
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle;
 
 	//ワールド変換
 	WorldTransform worldTransform_;
@@ -145,5 +190,9 @@ private:
 
 	//頂点データ
 	Vertex vertices_[4];
+
+	//テクスチャ
+	Texture* texture_ = nullptr;
+
 };
 

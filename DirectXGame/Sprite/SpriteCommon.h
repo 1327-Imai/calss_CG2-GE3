@@ -18,21 +18,27 @@ public:
 
 	void PreDraw();
 
-	UINT GetVerticesValue();
-
-	D3D12_VERTEX_BUFFER_VIEW* GetVBView();
-
-	DirectXCommon* GetDX12Base();
-
 	void Set2DCoordinateSystem(Matrix4& mat);
 
-	void LoadTexture(uint32_t index , const std::string& fileName);
+	UINT GetVerticesValue() {
+		return _countof(vertices_);
+	}
 
-	void SetTextureCommands(uint32_t index);
+	D3D12_VERTEX_BUFFER_VIEW* GetVBView() {
+		return &vbView_;
+	}
 
-	ComPtr<ID3D12Resource> GetTextureBuffer(uint32_t index)const;
+	DirectXCommon* GetDxCommon() {
+		return dxCommon_;
+	}
 
-	ComPtr<ID3D12Resource> GetVertBuff()const;
+	ComPtr<ID3D12Resource> GetVertBuff() const {
+		return vertBuff_;
+	}
+
+	D3D12_RESOURCE_DESC GetResDesc() {
+		return resDesc_;
+	}
 
 	//構造体
 private:
@@ -64,22 +70,5 @@ private:
 
 	//パイプラインステート
 	ComPtr<ID3D12PipelineState> pipelineState_ = nullptr;
-
-	//SRVヒープ
-	ComPtr<ID3D12DescriptorHeap> srvHeap_;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle_;
-
-	//ComPtr<ID3D12Resource> texBuff_ = nullptr;
-
-	//ComPtr<ID3D12Resource> texBuff2_ = nullptr;
-
-	//SRVの最大個数
-	static const size_t kMaxSRVCount = 2056;
-	std::array<ComPtr<ID3D12Resource> , kMaxSRVCount> textureBuffers_;
-
-	static std::string kDefaultTextureDerectoryPath;
-
-	UINT incremantSize_;
 
 };

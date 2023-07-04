@@ -1,18 +1,34 @@
 #include "Texture.h"
+ID3D12Device* Texture::device = nullptr;
+ID3D12GraphicsCommandList* Texture::cmdList = nullptr;
 
-class Model {
-public:
-	D3D12_RESOURCE_DESC GetResDesc();
-};
+const std::string Texture::baseDirectory = "Resources/Texture/";
 
-void Texture::LoadTexture(const wchar_t* fileName) {
+Texture::Texture(){
+}
+
+Texture::~Texture(){
+}
+
+void Texture::LoadTexture(const string& fileName) {
 
 	HRESULT result;
 
-	if (fileName) {
+	std::string fullPath = baseDirectory + fileName;
+
+	int filePathBufferSize = MultiByteToWideChar(
+		CP_ACP , 0 , fullPath.c_str() , -1 , nullptr , 0
+	);
+
+	std::vector<wchar_t> wfilePath(filePathBufferSize);
+	MultiByteToWideChar(
+		CP_ACP , 0 , fullPath.c_str() , -1 , wfilePath.data() , filePathBufferSize
+	);
+
+	if (wfilePath.data()) {
 		//WICテクスチャのロード
 		result = LoadFromWICFile(
-			fileName ,
+			wfilePath.data() ,
 			WIC_FLAGS_NONE ,
 			&metadata ,
 			scratchImg
@@ -59,7 +75,7 @@ void Texture::LoadTexture(const wchar_t* fileName) {
 	textureResouceDesc.SampleDesc.Count = 1;
 
 	//テクスチャバッファの生成
-	result = dx12base.GetDevice()->CreateCommittedResource(
+	result = device->CreateCommittedResource(
 		&textureHeapProp ,	//ヒープ設定
 		D3D12_HEAP_FLAG_NONE ,
 		&textureResouceDesc ,	//リソース設定
@@ -84,9 +100,15 @@ void Texture::LoadTexture(const wchar_t* fileName) {
 		);
 		assert(SUCCEEDED(result));
 	}
+
+
+	textureName = fileName;
+	for (int i = 0; i < 4; i++) {
+		textureName.pop_back();
+	}
 }
 
-void Texture::CreateSRV() {
+void Texture::SetSRV(ComPtr<ID3D12DescriptorHeap>& srvHeap , D3D12_CPU_DESCRIPTOR_HANDLE& srvHandle , D3D12_RESOURCE_DESC resDesc){
 	HRESULT result;
 
 	//デスクリプタヒープの生成
@@ -96,7 +118,7 @@ void Texture::CreateSRV() {
 	srvHeapDesc.NumDescriptors = kMaxSRVCount;
 
 	//設定をもとにSRV用デスクリプタヒープを生成
-	result = dx12base.GetDevice()->CreateDescriptorHeap(
+	result = device->CreateDescriptorHeap(
 		&srvHeapDesc ,
 		IID_PPV_ARGS(&srvHeap)
 	);
@@ -107,28 +129,23 @@ void Texture::CreateSRV() {
 	srvHandle = srvHeap->GetCPUDescriptorHandleForHeapStart();
 
 	//シェーダーリソースビューの作成
-	srvDesc.Format = model->GetResDesc().Format;
+	srvDesc.Format = resDesc.Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;	//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = model->GetResDesc().MipLevels;
+	srvDesc.Texture2D.MipLevels = resDesc.MipLevels;
 
 	//ハンドルの指す位置にシェーダーリソースビュー作成
-	dx12base.GetDevice()->CreateShaderResourceView(texBuff.Get() , &srvDesc , srvHandle);
+	device->CreateShaderResourceView(texBuff.Get() , &srvDesc , srvHandle);
 }
 
 
-void Texture::Draw() {
+void Texture::Draw(ComPtr<ID3D12DescriptorHeap> srvHeap) {
 	//SRVヒープの設定コマンド
-	dx12base.GetCmdList()->SetDescriptorHeaps(1 , srvHeap.GetAddressOf());
+	cmdList->SetDescriptorHeaps(1 , srvHeap.GetAddressOf());
 
 	//SRVヒープの先頭ハンドルを取得（SRVを指しているはず）
 	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
 
 	//SRVヒープの先頭にあるSRVをルートパラメータ1番に設定
-	dx12base.GetCmdList()->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
-}
-
-//アクセッサ
-void Texture::SetModel(Model* model) {
-	this->model = model;
+	cmdList->SetGraphicsRootDescriptorTable(1 , srvGpuHandle);
 }
