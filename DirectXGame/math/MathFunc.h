@@ -1,7 +1,5 @@
 #pragma once
 #include <math.h>
-#include <DirectXMath.h>
-using namespace DirectX;
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -27,11 +25,8 @@ namespace MathFunc {
 	}
 
 	namespace Utility {
-		//XMMATRIXをMatrix4に変換する関数
-		Matrix4 ConvertXMMATRIXtoMatrix4(XMMATRIX xmMatrix);
-
-		//ビュー行列を生成する関数
-		Matrix4 CreatMatView(Vector3 eye, Vector3 target, Vector3 up);
+		////ビュー行列を生成する関数
+		//Matrix4 CreatMatView(Vector3 eye, Vector3 target, Vector3 up);
 
 		//度数法⇔弧度法の関数
 		float Deg2Rad(float Deg);	//度数法を弧度法に変換する関数

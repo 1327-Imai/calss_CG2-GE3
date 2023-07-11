@@ -17,13 +17,32 @@ public:
 	//更新
 	void Update();
 
+private:
+	//ビュー行列の作成
+	void CreateMatView();
+
+	//プロジェクション行列の作成
+	void CreateMatProjection();
+
+	//ビルボード行列の作成
+	void CreateMatBillboard();
+
 	//アクセッサ
+public:
 	Matrix4 GetMatView() {
 		return matView_;
 	}
 
 	Matrix4 GetMatProjection() {
 		return matProjection_;
+	}
+
+	Matrix4 GetMatBillBoard() {
+		return matBillboard_;
+	}
+
+	Matrix4 GetMatBillBoardY() {
+		return matBillboardY_;
 	}
 
 	void SetPosition(Vector3 position) {
@@ -52,6 +71,10 @@ public:
 		return worldTransform_.scale_;
 	}
 
+	void SetTargetPos(Vector3 targetPos) {
+		targetPos_ = &targetPos;
+	}
+
 	//メンバ変数
 private:
 	WorldTransform worldTransform_;
@@ -67,6 +90,9 @@ private:
 	float fovY_;
 	float nearZ_;
 	float farZ_;
+
+	Matrix4 matBillboard_;
+	Matrix4 matBillboardY_;
 
 };
 

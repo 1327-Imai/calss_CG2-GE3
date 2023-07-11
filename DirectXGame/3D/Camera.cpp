@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "WinApp.h"
+#include <cassert>
 
 Camera::Camera() {
 }
@@ -8,6 +9,11 @@ Camera::~Camera() {
 }
 
 void Camera::Initialize() {
+
+	matView_.SetIdentityMatrix();
+	matProjection_.SetIdentityMatrix();
+	matBillboard_.SetIdentityMatrix();
+	matBillboardY_.SetIdentityMatrix();
 
 	worldTransform_.initialize();
 	worldTransform_.translation_ = {5 , 5 , -10};
@@ -28,31 +34,112 @@ void Camera::Update() {
 	};
 
 	up_ = {
-		sinf(MathFunc::Utility::Deg2Rad(worldTransform_.rotation_.z)) ,
-		cosf(MathFunc::Utility::Deg2Rad(worldTransform_.rotation_.z)) ,
+		0,
+		worldTransform_.matWorld_.m[1][1] ,
 		0
 	};
-	up_.nomalize();
+
+	up_.normalize();
 
 	if (targetPos_) {
 		target_ = *targetPos_;
 	}
 	else {
 		target_ = {
-			sinf(MathFunc::Utility::Deg2Rad(worldTransform_.rotation_.y)) ,
-			sinf(MathFunc::Utility::Deg2Rad(worldTransform_.rotation_.x)) ,
-			cosf(MathFunc::Utility::Deg2Rad(worldTransform_.rotation_.y))
+			worldTransform_.matWorld_.m[2][0] ,
+			worldTransform_.matWorld_.m[1][2] ,
+			worldTransform_.matWorld_.m[2][2]
 		};
-		target_.nomalize();
+
+		target_.normalize();
 		target_ += eye_;
 	}
 
-	matView_ = MathFunc::Utility::CreatMatView(eye_ , target_ , up_);
+	CreateMatView();
+	CreateMatProjection();
+	CreateMatBillboard();
 
+}
+
+void Camera::CreateMatView(){
+
+	Vector3 cameraAxisZ = target_ - eye_;
+
+	assert(!cameraAxisZ.length() == 0);
+	assert(!up_.length() == 0);
+
+	cameraAxisZ.normalize();
+
+	Vector3 cameraAxisX = up_.cross(cameraAxisZ);
+	cameraAxisX.normalize();
+
+	Vector3 cameraAxisY = cameraAxisZ.cross(cameraAxisX);
+	cameraAxisY.normalize();
+
+	matView_ = {
+		cameraAxisX.x , cameraAxisX.y , cameraAxisX.z , 0 ,
+		cameraAxisY.x , cameraAxisY.y , cameraAxisY.z , 0 ,
+		cameraAxisZ.x , cameraAxisZ.y , cameraAxisZ.z , 0 ,
+		0 , 0 , 0 , 1
+	};
+
+	matView_ = matView_.CulInvers();
+
+	Vector3 reverseEye = eye_ * -1;
+
+	float tX = cameraAxisX.dot(reverseEye);
+	float tY = cameraAxisY.dot(reverseEye);
+	float tZ = cameraAxisZ.dot(reverseEye);
+
+
+	matView_.m[3][0] = tX;
+	matView_.m[3][1] = tY;
+	matView_.m[3][2] = tZ;
+
+}
+
+void Camera::CreateMatProjection(){
 	matProjection_ = MathFunc::Utility::PerspectiveFovLH(
 		MathFunc::Utility::Deg2Rad(fovY_) ,
 		(float)WinApp::WINDOW_WIDTH / WinApp::WINDOW_HEIGHT ,
 		nearZ_ , farZ_
 	);
+}
 
+void Camera::CreateMatBillboard(){
+
+	Vector3 cameraAxisZ = target_ - eye_;
+
+	assert(!cameraAxisZ.length() == 0);
+	assert(!up_.length() == 0);
+
+	cameraAxisZ.normalize();
+
+	Vector3 cameraAxisX = up_.cross(cameraAxisZ);
+	cameraAxisX.normalize();
+
+	Vector3 cameraAxisY = cameraAxisZ.cross(cameraAxisX);
+	cameraAxisY.normalize();
+
+
+	matBillboard_ = {
+		cameraAxisX.x , cameraAxisX.y , cameraAxisX.z , 0 ,
+		cameraAxisY.x , cameraAxisY.y , cameraAxisY.z , 0 ,
+		cameraAxisZ.x , cameraAxisZ.y , cameraAxisZ.z , 0 ,
+		0 , 0 , 0 , 1
+	};
+
+	Vector3 ybillCameraAxisX = cameraAxisX;
+
+	Vector3 ybillCameraAxisY = up_;
+	ybillCameraAxisY.normalize();
+
+	Vector3 ybillCameraAxisZ = ybillCameraAxisX.cross(ybillCameraAxisY);
+
+	matBillboardY_ = {
+		ybillCameraAxisX.x , ybillCameraAxisX.y , ybillCameraAxisX.z , 0 ,
+		ybillCameraAxisY.x , ybillCameraAxisY.y , ybillCameraAxisY.z , 0 ,
+		ybillCameraAxisZ.x , ybillCameraAxisZ.y , ybillCameraAxisZ.z , 0 ,
+		0 , 0 , 0 , 1
+	};
 }

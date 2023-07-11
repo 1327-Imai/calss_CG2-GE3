@@ -61,6 +61,9 @@
     <Filter Include="source\Texture">
       <UniqueIdentifier>{65faf79c-1564-4947-84a7-af5bfe166a7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader\Obj">
+      <UniqueIdentifier>{d05b60be-f3f3-4468-8a5d-07958f5cfcc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math\MathFunc.cpp">
@@ -120,6 +123,12 @@
     <ClCompile Include="3D\Camera.cpp">
       <Filter>source\3D</Filter>
     </ClCompile>
+    <ClCompile Include="3D\Billboard.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\BillboardY.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\MathFunc.h">
@@ -176,6 +185,12 @@
     <ClInclude Include="3D\Camera.h">
       <Filter>header\3D</Filter>
     </ClInclude>
+    <ClInclude Include="3D\Billboard.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\BillboardY.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shader\Basic\Basic.hlsli">
@@ -183,6 +198,9 @@
     </None>
     <None Include="Resources\shader\Sprite\Sprite.hlsli">
       <Filter>shader\Sprite</Filter>
+    </None>
+    <None Include="Resources\shader\Obj\Obj.hlsli">
+      <Filter>shader\Obj</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +215,12 @@
     </FxCompile>
     <FxCompile Include="Resources\shader\Sprite\SpriteVS.hlsl">
       <Filter>shader\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Obj\ObjPS.hlsl">
+      <Filter>shader\Obj</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Obj\ObjVS.hlsl">
+      <Filter>shader\Obj</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

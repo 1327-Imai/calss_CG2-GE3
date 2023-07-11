@@ -1,18 +1,34 @@
-#include "Object3D.h"
+#include "Billboard.h"
 
-ID3D12Device* Object3D::device_ = nullptr;
-ID3D12GraphicsCommandList* Object3D::cmdList_ = nullptr;
-ComPtr<ID3D12RootSignature> Object3D::rootSignature_;
-ComPtr<ID3D12PipelineState> Object3D::pipelineState_;
-Camera* Object3D::camera_ = nullptr;
+ID3D12Device* Billboard::device_ = nullptr;
+ID3D12GraphicsCommandList* Billboard::cmdList_ = nullptr;
+ComPtr<ID3D12RootSignature> Billboard::rootSignature_;
+ComPtr<ID3D12PipelineState> Billboard::pipelineState_;
+ComPtr<ID3D12Resource> Billboard::vertBuff;
+D3D12_VERTEX_BUFFER_VIEW Billboard::vbView;
+Billboard::VertexPosNormalUv Billboard::vertices[vertexCount_];
+uint16_t Billboard::indices[indexCount_];
+ComPtr<ID3D12Resource> Billboard::indexBuff;
+D3D12_INDEX_BUFFER_VIEW Billboard::ibView;
+D3D12_RESOURCE_DESC Billboard::resDesc;
+Camera* Billboard::camera_ = nullptr;
 
-Object3D::Object3D() {
+
+Billboard::Billboard() {
 }
 
-Object3D::~Object3D() {
+Billboard::~Billboard() {
 }
 
-void Object3D::CreateGraphicsPipeline() {
+void Billboard::StaticInitialize(DirectXCommon* dxCommon , Camera* camera){
+	SetDevice(dxCommon->GetDevice());
+	SetCmdList(dxCommon->GetCmdList());
+	SetCamera(camera);
+	CreateModel();
+	CreateGraphicsPipeline();
+}
+
+void Billboard::CreateGraphicsPipeline() {
 
 	HRESULT result;
 
@@ -23,7 +39,7 @@ void Object3D::CreateGraphicsPipeline() {
 
 	// 頂点シェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shader/Obj/ObjVS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Basic/BasicVS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -52,7 +68,7 @@ void Object3D::CreateGraphicsPipeline() {
 
 	//ピクセルシェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shader/Obj/ObjPS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Basic/BasicPS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -222,14 +238,106 @@ void Object3D::CreateGraphicsPipeline() {
 
 }
 
-void Object3D::StaticInitialize(DirectXCommon* dxCommon , Camera* camera){
-	SetDevice(dxCommon->GetDevice());
-	SetCmdList(dxCommon->GetCmdList());
-	SetCamera(camera);
-	CreateGraphicsPipeline();
+void Billboard::CreateModel(){
+	HRESULT result;
+
+	//四角形の頂点データ
+	VertexPosNormalUv verticesSquare[]{
+		{{-1.0f , -1.0f , 0.0f}, {0 , 0 , 1}, {0 , 1}} ,
+		{{-1.0f , +1.0f , 0.0f}, {0 , 0 , 1}, {0 , 0}} ,
+		{{+1.0f , -1.0f , 0.0f}, {0 , 0 , 1}, {1 , 1}} ,
+		{{+1.0f , +1.0f , 0.0f}, {0 , 0 , 1}, {1 , 0}}
+	};
+
+	//メンバ変数にコピー
+	std::copy(std::begin(verticesSquare) , std::end(verticesSquare) , vertices);
+
+	//四角形にインデックスデータ
+	uint16_t indicesSquare[] {
+		0 , 1 , 2 ,	
+		2 , 1 , 3	
+	};
+
+	//メンバ変数にコピー
+	std::copy(std::begin(indicesSquare) , std::end(indicesSquare) , indices);
+
+	//頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
+	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * vertexCount_);
+
+	//インデックスデータ全体のサイズ
+	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indexCount_);
+
+	//頂点バッファの設定
+	D3D12_HEAP_PROPERTIES heapProp{};		//ヒープ設定
+	heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;	//GPUへの転送用
+
+	//リソース設定
+	resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resDesc.Width = sizeVB; //頂点データ全体のサイズ
+	resDesc.Height = 1;
+	resDesc.DepthOrArraySize = 1;
+	resDesc.MipLevels = 1;
+	resDesc.SampleDesc.Count = 1;
+	resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	//頂点バッファの生成
+	result = device_->CreateCommittedResource(
+		&heapProp ,	//ヒープ設定
+		D3D12_HEAP_FLAG_NONE ,
+		&resDesc ,	//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ ,
+		nullptr ,
+		IID_PPV_ARGS(&vertBuff)
+	);
+	assert(SUCCEEDED(result));
+
+	//インデックスバッファの生成
+	result = device_->CreateCommittedResource(
+		&heapProp ,	//ヒープ設定
+		D3D12_HEAP_FLAG_NONE ,
+		&resDesc ,	//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ ,
+		nullptr ,
+		IID_PPV_ARGS(&indexBuff)
+	);
+	assert(SUCCEEDED(result));
+
+	//GPU上のバッファに対応した仮想メモリ(メインメモリ上)を取得
+	VertexPosNormalUv* vertMap = nullptr;
+	result = vertBuff->Map(0 , nullptr , (void**)&vertMap);
+	//全頂点に対して
+	for (int i = 0; i < vertexCount_; i++) {
+		vertMap[i] = vertices[i];	//座標をコピー
+	}
+	//繋がりを解除
+	vertBuff->Unmap(0 , nullptr);
+
+	//インデックスバッファをマッピング
+	uint16_t* indexMap = nullptr;
+	result = indexBuff->Map(0 , nullptr , (void**)&indexMap);
+	//全インデックスに対して
+	for (int i = 0; i < indexCount_; i++) {
+		indexMap[i] = indices[i];	//座標をコピー
+	}
+	//繋がりを解除
+	indexBuff->Unmap(0 , nullptr);
+
+	//頂点バッファビューの作成
+	//GPU仮想アドレス
+	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+	//頂点バッファのサイズ
+	vbView.SizeInBytes = sizeVB;
+	//頂点１つ分のデータサイズ
+	vbView.StrideInBytes = sizeof(vertices[0]);
+
+	//インデックスバッファビューの作成
+	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R16_UINT;
+	ibView.SizeInBytes = sizeIB;
+
 }
 
-void Object3D::Initialize() {
+void Billboard::Initialize() {
 
 	CreateConstBufferTransform();
 	CreateConstBufferMaterial();
@@ -238,15 +346,15 @@ void Object3D::Initialize() {
 
 }
 
-void Object3D::Update() {
+void Billboard::Update() {
 
-	worldTransform_.UpdateMatWorld();
+	worldTransform_.UpdateMatWorld(camera_->GetMatBillBoard());
 
 	UpdateConstBufferTransform();
 
 }
 
-void Object3D::Draw() {
+void Billboard::Draw() {
 	//パイプラインステートの設定
 	cmdList_->SetPipelineState(pipelineState_.Get());
 	//ルートシグネチャの設定
@@ -262,19 +370,21 @@ void Object3D::Draw() {
 		texture_->Draw(srvHeap_);
 	}
 
-	//モデル描画
-	if (model_) {
-		model_->Draw();
-	}
+	//頂点バッファの設定
+	cmdList_->IASetVertexBuffers(0 , 1 , &vbView);
+	//インデックスバッファの設定
+	cmdList_->IASetIndexBuffer(&ibView);
+	//描画コマンド
+	cmdList_->DrawIndexedInstanced(indexCount_ , 1 , 0 , 0 , 0);
 
 }
 
-void Object3D::SetTexture(Texture* texture) {
+void Billboard::SetTexture(Texture* texture) {
 	texture_ = texture;
-	texture_->SetSRV(srvHeap_ , srvHandle_ , model_->GetResDesc());
+	texture_->SetSRV(srvHeap_ , srvHandle_ , resDesc);
 }
 
-void Object3D::CreateConstBufferTransform() {
+void Billboard::CreateConstBufferTransform() {
 	HRESULT result;
 
 	//定数バッファの生成
@@ -305,7 +415,7 @@ void Object3D::CreateConstBufferTransform() {
 
 }
 
-void Object3D::CreateConstBufferMaterial() {
+void Billboard::CreateConstBufferMaterial() {
 	HRESULT result;
 
 	//定数バッファの生成
@@ -344,7 +454,7 @@ void Object3D::CreateConstBufferMaterial() {
 	constMapMaterial->color = {1.0f , 1.0f , 1.0f , 0.5f};
 }
 
-void Object3D::UpdateConstBufferTransform() {
+void Billboard::UpdateConstBufferTransform() {
 	HRESULT result;
 	//定数バッファへデータ転送
 	ConstBufferDataTransform* constMap = nullptr;
