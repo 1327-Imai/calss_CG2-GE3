@@ -9,6 +9,9 @@ public:
 	//ワールド変換行列の更新
 	void UpdateMatWorld();
 
+	//ビルボード行列を使ったワールド行列の更新
+	void UpdateMatWorld(Matrix4 matBillbord);
+
 	//メンバ変数
 	//スケール
 	Vector3 scale_;

@@ -16,7 +16,7 @@ float Vector2::length() const {
 	return std::sqrt(x * x + y * y);
 }
 
-Vector2& Vector2::nomalize() {
+Vector2& Vector2::normalize() {
 
 	float len = length();
 	if (len != 0) {

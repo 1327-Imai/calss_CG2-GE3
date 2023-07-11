@@ -1,5 +1,5 @@
-#include "Matrix4.h"
-//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+ï»¿#include "Matrix4.h"
+//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Matrix4::Matrix4() {
 
 	SetIdentityMatrix();
@@ -46,6 +46,36 @@ void Matrix4::SetIdentityMatrix() {
 	m[1][1] = 1;
 	m[2][2] = 1;
 	m[3][3] = 1;
+}
+
+Matrix4 Matrix4::CulInvers() {
+
+	Matrix4 matInvers;
+	matInvers.SetIdentityMatrix();
+
+	float tmp;
+
+	for (int i = 0; i < 4; i++) {
+		tmp = 1 / m[i][i];
+		for (int j = 0; j < 4; j++) {
+			m[i][j] *= tmp;
+			matInvers.m[i][j] *= tmp;
+		}
+
+		for (int j = 0; j < 4; j++) {
+			if (j != i) {
+
+				tmp = m[j][i];
+
+				for (int k = 0; k < 4; k++) {
+					m[j][k] -= tmp * m[i][k];
+					matInvers.m[j][k] -= tmp * matInvers.m[i][k];
+				}
+			}
+		}
+	}
+
+	return matInvers;
 }
 
 Matrix4 Matrix4::operator+=(const Matrix4& m) {

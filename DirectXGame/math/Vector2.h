@@ -7,7 +7,7 @@ public:
 
 	//ƒƒ“ƒoŠÖ”
 	float length() const;
-	Vector2& nomalize();
+	Vector2& normalize();
 	float dot(const Vector2& v) const;
 	float cross(const Vector2& v) const;
 

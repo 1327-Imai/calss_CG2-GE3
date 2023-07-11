@@ -15,6 +15,9 @@ public:
 	//単位行列を代入する
 	void SetIdentityMatrix();
 
+	//逆行列を計算する
+	Matrix4 CulInvers();
+
 	//代入演算子オーバーロード
 	Matrix4 operator+=(const Matrix4& m);
 	Matrix4 operator-=(const Matrix4& m);
