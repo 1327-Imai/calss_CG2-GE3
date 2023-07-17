@@ -5,17 +5,18 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4.h"
+#include "Quaternion.h"
 
 namespace MathFunc {
 
 	const float PI = 3.141592f;
-	const float G = 2.0f;
+	const float G = 9.8f / 60.0f;
 
 	namespace Affine {
 		//ワールド変換行列を設定する関数
-		void SetMatScale(Matrix4& affineMat, Vector3 scale);				//スケーリング行列を設定する関数
-		void SetMatRotation(Matrix4& affineMat, Vector3 rotation);			//回転行列を設定する関数
-		void SetMatTranslation(Matrix4& affineMat, Vector3 translation);	//平行移動行列の設定をする関数
+		void SetMatScale(Matrix4& affineMat , Vector3 scale);				//スケーリング行列を設定する関数
+		void SetMatRotation(Matrix4& affineMat , Vector3 rotation);			//回転行列を設定する関数
+		void SetMatTranslation(Matrix4& affineMat , Vector3 translation);	//平行移動行列の設定をする関数
 
 		//ワールド変換行列を生成する関数
 		Matrix4 CreateMatScale(Vector3 scale);				//スケーリング行列を生成する関数
@@ -33,29 +34,39 @@ namespace MathFunc {
 		float Rad2Deg(float rad);	//弧度法を度数法に変換する関数
 
 		//ベクトルと行列の掛け算をする関数
-		Vector3 MulVector3AndMatrix4(Vector3 vec, Matrix4 mat);
+		Vector3 MulVector3AndMatrix4(Vector3 vec , Matrix4 mat);
 
-		Matrix4 PerspectiveFovLH(float fovAngleY, float  aspectRatio, float  nearZ, float farZ);
+		Matrix4 PerspectiveFovLH(float fovAngleY , float  aspectRatio , float  nearZ , float farZ);
+
+		//任意軸回転を表すQuaternionの生成
+		Quaternion MakeAxisAngle(const Vector3& axis , float angle);
+
+		//ベクトルをQuaternionで回転させた結果のベクトルを求める
+		Vector3 RotateVector(const Vector3& v , const Quaternion& q);
+
+		//Quaternionから回転行列を求める
+		Matrix4 MakeRotateMatrix(const Quaternion& q);
+
 	}
 
 	namespace Ease {
-		double In(double start, double end, double time, double max_time);
+		double In(double start , double end , double time , double max_time);
 
-		double Out(double start, double end, double time, double max_time);
+		double Out(double start , double end , double time , double max_time);
 
-		double InOut(double start, double end, double time, double max_time);
+		double InOut(double start , double end , double time , double max_time);
 
-		double In_Back(double start, double end, double time, double max_time);
+		double In_Back(double start , double end , double time , double max_time);
 
-		double Out_Back(double start, double end, double time, double max_time);
+		double Out_Back(double start , double end , double time , double max_time);
 
-		double InOut_Back(double start, double end, double time, double max_time);
+		double InOut_Back(double start , double end , double time , double max_time);
 
-		double Out_Bounce(double start, double end, double time, double max_time);
+		double Out_Bounce(double start , double end , double time , double max_time);
 
-		double In_Bounce(double start, double end, double time, double max_time);
+		double In_Bounce(double start , double end , double time , double max_time);
 
-		double InOut_Bounce(double start, double end, double time, double max_time);
+		double InOut_Bounce(double start , double end , double time , double max_time);
 	}
 
 }

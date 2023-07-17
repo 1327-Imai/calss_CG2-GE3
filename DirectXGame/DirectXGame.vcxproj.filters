@@ -129,6 +129,9 @@
     <ClCompile Include="3D\BillboardY.cpp">
       <Filter>source\3D</Filter>
     </ClCompile>
+    <ClCompile Include="math\Quaternion.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\MathFunc.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="3D\BillboardY.h">
       <Filter>header\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Quaternion.h">
+      <Filter>header\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

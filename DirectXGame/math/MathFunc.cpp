@@ -204,6 +204,61 @@ Matrix4 MathFunc::Utility::PerspectiveFovLH(float fovAngleY , float aspectRatio 
 	return perspectiveFovLH;
 }
 
+Quaternion MathFunc::Utility::MakeAxisAngle(const Vector3& axis , float angle) {
+	Quaternion ans;
+	Vector3 ansV = axis;
+
+	ansV.normalize();
+
+	ansV *= sinf(angle / 2);
+
+	ans = {
+		ansV.x ,
+		ansV.y ,
+		ansV.z ,
+		cosf(angle / 2)
+	};
+
+	return ans;
+
+}
+
+Vector3 MathFunc::Utility::RotateVector(const Vector3& v , const Quaternion& q) {
+	Quaternion ans = q;
+	Quaternion temp = q;
+	Quaternion rotaVec = {v.x , v.y , v.z , 0};
+
+	ans.Multiply(rotaVec);
+	ans.Multiply(temp.Conjugate());
+
+	return Vector3(ans.x , ans.y , ans.z);
+
+}
+
+Matrix4 MathFunc::Utility::MakeRotateMatrix(const Quaternion& q) {
+
+	Matrix4 ans;
+	ans.SetIdentityMatrix();
+
+	ans.m[0][0] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
+	ans.m[0][1] = 2 * (q.x * q.y + q.w * q.z);
+	ans.m[0][2] = 2 * (q.x * q.z - q.w * q.y);
+	ans.m[0][3] = 0;
+
+	ans.m[1][0] = 2 * (q.x * q.y - q.w * q.z);
+	ans.m[1][1] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
+	ans.m[1][2] = 2 * (q.y * q.z + q.w * q.x);
+	ans.m[1][3] = 0;
+
+	ans.m[0][2] = 2 * (q.x * q.z + q.w * q.y);
+	ans.m[0][1] = 2 * (q.y * q.z - q.w * q.x);
+	ans.m[0][0] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
+	ans.m[0][3] = 0;
+
+	return ans;
+
+}
+
 double MathFunc::Ease::In(double start , double end , double time , double max_time)
 {
 	time /= max_time;
