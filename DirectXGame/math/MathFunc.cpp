@@ -225,11 +225,12 @@ Quaternion MathFunc::Utility::MakeAxisAngle(const Vector3& axis , float angle) {
 
 Vector3 MathFunc::Utility::RotateVector(const Vector3& v , const Quaternion& q) {
 	Quaternion ans = q;
-	Quaternion temp = q;
-	Quaternion rotaVec = {v.x , v.y , v.z , 0};
 
-	ans.Multiply(rotaVec);
-	ans.Multiply(temp.Conjugate());
+	Quaternion pos = {v.x , v.y , v.z , 0};
+	Quaternion rotaQ = q;
+
+	ans = ans.Multiply(pos);
+	ans = ans.Multiply(rotaQ.Conjugate());
 
 	return Vector3(ans.x , ans.y , ans.z);
 
@@ -246,14 +247,14 @@ Matrix4 MathFunc::Utility::MakeRotateMatrix(const Quaternion& q) {
 	ans.m[0][3] = 0;
 
 	ans.m[1][0] = 2 * (q.x * q.y - q.w * q.z);
-	ans.m[1][1] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
+	ans.m[1][1] = powf(q.w , 2) - powf(q.x , 2) + powf(q.y , 2) - powf(q.z , 2);
 	ans.m[1][2] = 2 * (q.y * q.z + q.w * q.x);
 	ans.m[1][3] = 0;
 
-	ans.m[0][2] = 2 * (q.x * q.z + q.w * q.y);
-	ans.m[0][1] = 2 * (q.y * q.z - q.w * q.x);
-	ans.m[0][0] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
-	ans.m[0][3] = 0;
+	ans.m[2][0] = 2 * (q.x * q.z + q.w * q.y);
+	ans.m[2][1] = 2 * (q.y * q.z - q.w * q.x);
+	ans.m[2][2] = powf(q.w , 2) - powf(q.x , 2) - powf(q.y , 2) + powf(q.z , 2);
+	ans.m[2][3] = 0;
 
 	return ans;
 

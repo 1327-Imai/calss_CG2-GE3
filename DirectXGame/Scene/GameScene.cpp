@@ -198,13 +198,22 @@ void GameScene::Update() {
 
 	Quaternion rotation = MathFunc::Utility::MakeAxisAngle({0.0f , 0.0f , 1.0f} , MathFunc::Utility::Deg2Rad(90));
 	Vector3 poiintY = {0.0f , 1.0f , 0.0f};
-	Matrix4 rotateMatrix = MathFunc::Utility::MakeRotateMatrix(rotation);
 	Vector3 rotateQ = MathFunc::Utility::RotateVector(poiintY , rotation);
+
 	Matrix4 mat;
+	Matrix4 rotateMatrix = MathFunc::Utility::MakeRotateMatrix(rotation);
 	mat.SetIdentityMatrix();
 	MathFunc::Affine::SetMatTranslation(mat , poiintY);
 	mat *= rotateMatrix;
 	Vector3 rotateM = {mat.m[3][0] , mat.m[3][1] , mat.m[3][2]};
+
+	if (rotateQ == rotateM) {
+		int a = 0;
+	}
+	else {
+		int a = 0;
+	}
+
 }
 
 //ï`âÊèàóù

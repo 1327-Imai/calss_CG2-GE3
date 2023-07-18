@@ -1,24 +1,25 @@
 #include "Quaternion.h"
 
-Quaternion::Quaternion(){
+Quaternion::Quaternion() {
 	x = 0;
 	y = 0;
 	z = 0;
 	w = 1;
 }
 
-Quaternion::Quaternion(float x , float y , float z , float w){
+Quaternion::Quaternion(float x , float y , float z , float w) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 	this->w = w;
 }
 
-Quaternion::~Quaternion(){
+Quaternion::~Quaternion() {
 }
 
-Quaternion Quaternion::Multiply(const Quaternion q){
+Quaternion Quaternion::Multiply(const Quaternion q) {
 	Quaternion ans;
+	ans.IdentityQuaternion();
 
 	ans.w = w * q.w - x * q.x - y * q.y - z * q.z;
 	ans.x = y * q.z - z * q.y + w * q.x + x * q.w;
@@ -28,14 +29,14 @@ Quaternion Quaternion::Multiply(const Quaternion q){
 	return ans;
 }
 
-void Quaternion::IdentityQuaternion(){
+void Quaternion::IdentityQuaternion() {
 	x = 0;
 	y = 0;
 	z = 0;
 	w = 1;
 }
 
-Quaternion Quaternion::Conjugate(){
+Quaternion Quaternion::Conjugate() {
 	Quaternion ans;
 	Vector3 thisV = {x , y , z};
 
@@ -49,12 +50,12 @@ Quaternion Quaternion::Conjugate(){
 	return ans;
 }
 
-float Quaternion::Norm(){
+float Quaternion::Norm() {
 	return sqrt(w * w + x * x + y * y + z * z);
 }
 
-Quaternion Quaternion::Normalize(){
-	
+Quaternion Quaternion::Normalize() {
+
 	Quaternion ans = *this;
 
 	ans /= this->Norm();
@@ -62,7 +63,7 @@ Quaternion Quaternion::Normalize(){
 	return ans;
 }
 
-Quaternion Quaternion::Inverse(){
+Quaternion Quaternion::Inverse() {
 
 	Quaternion ans;
 
@@ -73,15 +74,15 @@ Quaternion Quaternion::Inverse(){
 
 }
 
-Quaternion Quaternion::operator+() const{
+Quaternion Quaternion::operator+() const {
 	return *this;
 }
 
-Quaternion Quaternion::operator-() const{
-	return Quaternion(-x,-y,-z,-w);
+Quaternion Quaternion::operator-() const {
+	return Quaternion(-x , -y , -z , -w);
 }
 
-Quaternion Quaternion::operator+=(const Quaternion& q){
+Quaternion Quaternion::operator+=(const Quaternion& q) {
 	x += q.x;
 	y += q.y;
 	z += q.z;
@@ -89,7 +90,7 @@ Quaternion Quaternion::operator+=(const Quaternion& q){
 	return *this;
 }
 
-Quaternion Quaternion::operator-=(const Quaternion& q){
+Quaternion Quaternion::operator-=(const Quaternion& q) {
 	x -= q.x;
 	y -= q.y;
 	z -= q.z;
@@ -97,7 +98,7 @@ Quaternion Quaternion::operator-=(const Quaternion& q){
 	return *this;
 }
 
-Quaternion Quaternion::operator*=(float s){
+Quaternion Quaternion::operator*=(float s) {
 	x *= s;
 	y *= s;
 	z *= s;
@@ -105,7 +106,7 @@ Quaternion Quaternion::operator*=(float s){
 	return *this;
 }
 
-Quaternion Quaternion::operator/=(float s){
+Quaternion Quaternion::operator/=(float s) {
 	x /= s;
 	y /= s;
 	z /= s;
@@ -113,7 +114,7 @@ Quaternion Quaternion::operator/=(float s){
 	return *this;
 }
 
-bool Quaternion::operator==(const Quaternion& q){
+bool Quaternion::operator==(const Quaternion& q) {
 	if (x == q.x &&
 		y == q.y &&
 		z == q.z &&
@@ -124,7 +125,7 @@ bool Quaternion::operator==(const Quaternion& q){
 	return false;
 }
 
-bool Quaternion::operator!=(const Quaternion& q){
+bool Quaternion::operator!=(const Quaternion& q) {
 	if (*this == q) {
 		return false;
 	}
