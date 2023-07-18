@@ -113,121 +113,103 @@ void GameScene::Initialize(WinApp* winApp , DirectXCommon* dxCommon) {
 	billboardY_->SetPosition({-3 , 0 , 0});
 
 
-	//pos = {0 , 0 , -10};
-	//rotation = {0 , 0 , 0};
+	pos = {0 , 0 , -10};
+	rotation = {0 , 0 , 0};
 }
 
 //更新処理
 void GameScene::Update() {
 	//DirectX毎フレーム処理
 	//更新処理
-	//input_->Update();
+	input_->Update();
 
-	//if (input_->PushKey(DIK_D)) {
-	//	pos.x += 0.1f;
-	//}
-	//if (input_->PushKey(DIK_A)) {
-	//	pos.x -= 0.1f;
-	//}
-	//if (input_->PushKey(DIK_W)) {
-	//	pos.y += 0.1f;
-	//}
-	//if (input_->PushKey(DIK_S)) {
-	//	pos.y -= 0.1f;
-	//}
-
-	////if (input_->PushKey(DIK_UP)) {
-	////	rotation.x = object1_->GetRotation().x + MathFunc::Utility::Deg2Rad(1.0f);
-	////}
-	////if (input_->PushKey(DIK_DOWN)) {
-	////	rotation.x = object1_->GetRotation().x - MathFunc::Utility::Deg2Rad(1.0f);
-	////}
-	////if (input_->PushKey(DIK_LEFT)) {
-	////	rotation.y = object1_->GetRotation().y - MathFunc::Utility::Deg2Rad(1.0f);
-	////}
-	////if (input_->PushKey(DIK_RIGHT)) {
-	////	rotation.y = object1_->GetRotation().y + MathFunc::Utility::Deg2Rad(1.0f);
-	////}
-	////if (input_->PushKey(DIK_X)) {
-	////	rotation.z = object1_->GetRotation().z + MathFunc::Utility::Deg2Rad(1.0f);
-	////}
+	if (input_->PushKey(DIK_D)) {
+		pos.x += 0.1f;
+	}
+	if (input_->PushKey(DIK_A)) {
+		pos.x -= 0.1f;
+	}
+	if (input_->PushKey(DIK_W)) {
+		pos.y += 0.1f;
+	}
+	if (input_->PushKey(DIK_S)) {
+		pos.y -= 0.1f;
+	}
 
 	//if (input_->PushKey(DIK_UP)) {
-	//	rotation.x += MathFunc::Utility::Deg2Rad(1.0f);
+	//	rotation.x = object1_->GetRotation().x + MathFunc::Utility::Deg2Rad(1.0f);
 	//}
 	//if (input_->PushKey(DIK_DOWN)) {
-	//	rotation.x -= MathFunc::Utility::Deg2Rad(1.0f);
+	//	rotation.x = object1_->GetRotation().x - MathFunc::Utility::Deg2Rad(1.0f);
 	//}
 	//if (input_->PushKey(DIK_LEFT)) {
-	//	rotation.y -= MathFunc::Utility::Deg2Rad(1.0f);
+	//	rotation.y = object1_->GetRotation().y - MathFunc::Utility::Deg2Rad(1.0f);
 	//}
 	//if (input_->PushKey(DIK_RIGHT)) {
-	//	rotation.y += MathFunc::Utility::Deg2Rad(1.0f);
+	//	rotation.y = object1_->GetRotation().y + MathFunc::Utility::Deg2Rad(1.0f);
 	//}
 	//if (input_->PushKey(DIK_X)) {
-	//	rotation.z += MathFunc::Utility::Deg2Rad(1.0f);
+	//	rotation.z = object1_->GetRotation().z + MathFunc::Utility::Deg2Rad(1.0f);
 	//}
+
+	if (input_->PushKey(DIK_UP)) {
+		rotation.x -= MathFunc::Utility::Deg2Rad(1.0f);
+	}
+	if (input_->PushKey(DIK_DOWN)) {
+		rotation.x += MathFunc::Utility::Deg2Rad(1.0f);
+	}
+	if (input_->PushKey(DIK_LEFT)) {
+		rotation.y -= MathFunc::Utility::Deg2Rad(1.0f);
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
+		rotation.y += MathFunc::Utility::Deg2Rad(1.0f);
+	}
+	if (input_->PushKey(DIK_X)) {
+		rotation.z += MathFunc::Utility::Deg2Rad(1.0f);
+	}
 
 	//camera_->SetPosition(pos);
-	//camera_->SetRotation(rotation);
+	camera_->SetRotation(rotation);
 
-	////object1_->SetRotation(rotation);
+	object1_->SetRotation(rotation);
 
-	//camera_->Update();
+	camera_->Update();
 
-	//if (input_->PushKey(DIK_SPACE)) {
-	//	object1_->SetTexture(textureManager_->CallTexture("cube"));
-	//	sprite_->SetTexture(textureManager_->CallTexture("reimu"));
-	//}
-	//else {
-	//	object1_->SetTexture(textureManager_->CallTexture("white1x1"));
-	//	sprite_->SetTexture(textureManager_->CallTexture("texture"));
-	//}
-
-
-
-	//object1_->Update();
-	//object2_->Update();
-	//object3_->Update();
-	//object4_->Update();
-	//object5_->Update();
-	//object6_->Update();
-	//billboard_->Update();
-	//billboardY_->Update();
-	//sprite_->Update();
-
-	Quaternion rotation = MathFunc::Utility::MakeAxisAngle({0.0f , 0.0f , 1.0f} , MathFunc::Utility::Deg2Rad(90));
-	Vector3 poiintY = {0.0f , 1.0f , 0.0f};
-	Vector3 rotateQ = MathFunc::Utility::RotateVector(poiintY , rotation);
-
-	Matrix4 mat;
-	Matrix4 rotateMatrix = MathFunc::Utility::MakeRotateMatrix(rotation);
-	mat.SetIdentityMatrix();
-	MathFunc::Affine::SetMatTranslation(mat , poiintY);
-	mat *= rotateMatrix;
-	Vector3 rotateM = {mat.m[3][0] , mat.m[3][1] , mat.m[3][2]};
-
-	if (rotateQ == rotateM) {
-		int a = 0;
+	if (input_->PushKey(DIK_SPACE)) {
+		object1_->SetTexture(textureManager_->CallTexture("cube"));
+		sprite_->SetTexture(textureManager_->CallTexture("reimu"));
 	}
 	else {
-		int a = 0;
+		object1_->SetTexture(textureManager_->CallTexture("white1x1"));
+		sprite_->SetTexture(textureManager_->CallTexture("texture"));
 	}
+
+
+
+	object1_->Update();
+	object2_->Update();
+	object3_->Update();
+	object4_->Update();
+	object5_->Update();
+	object6_->Update();
+	billboard_->Update();
+	billboardY_->Update();
+	sprite_->Update();
 
 }
 
 //描画処理
 void GameScene::Draw() {
 	//3D描画
-	//object1_->Draw();
-	//object2_->Draw();
-	//object3_->Draw();
-	//object4_->Draw();
-	//object5_->Draw();
-	//object6_->Draw();
+	object1_->Draw();
+	object2_->Draw();
+	object3_->Draw();
+	object4_->Draw();
+	object5_->Draw();
+	object6_->Draw();
 
-	//billboard_->Draw();
-	//billboardY_->Draw();
+	billboard_->Draw();
+	billboardY_->Draw();
 
 	//スプライト描画
 	spriteCommon_->PreDraw();

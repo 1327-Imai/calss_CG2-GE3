@@ -19,30 +19,20 @@ void MathFunc::Affine::SetMatScale(Matrix4& affineMat , Vector3 scale) {
 //‰ñ“]s—ñ‚ğİ’è‚·‚éŠÖ”
 void MathFunc::Affine::SetMatRotation(Matrix4& affineMat , Vector3 rotation) {
 
+	Quaternion rotaQ;
+
 	//‰ñ“]s—ñ‚ğéŒ¾
 	//Z²‰ñ“]
-	Matrix4 matRotZ = {
-		(float)cos(rotation.z) , (float)sin(rotation.z) , 0 , 0 ,
-		(float)-sin(rotation.z) , (float)cos(rotation.z) , 0 , 0 ,
-		0 , 0 , 1 , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 0 , 1.0f} , rotation.z);
+	Matrix4 matRotZ = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//X²‰ñ“]
-	Matrix4 matRotX = {
-		1 , 0 , 0 , 0 ,
-		0 , (float)cos(rotation.x) , (float)sin(rotation.x) , 0 ,
-		0 , -(float)sin(rotation.x) , (float)cos(rotation.x) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({1.0f , 0 , 0} , rotation.x);
+	Matrix4 matRotX = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Y²‰ñ“]
-	Matrix4 matRotY = {
-		(float)cos(rotation.y) , 0 , (float)-sin(rotation.y) , 0 ,
-		0 , 1 , 0 , 0 ,
-		(float)sin(rotation.y) , 0 , (float)cos(rotation.y) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 1.0f , 0} , rotation.y);
+	Matrix4 matRotY = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//s—ñ‚ÌŒvZ
 	affineMat *= matRotZ;
@@ -92,28 +82,20 @@ Matrix4 MathFunc::Affine::CreateMatRotation(Vector3 rotation) {
 	matRot.SetIdentityMatrix();
 
 	//Z²‰ñ“]
-	Matrix4 matRotZ = {
-		(float)cos(rotation.z) , (float)sin(rotation.z) , 0 , 0 ,
-		(float)-sin(rotation.z) , (float)cos(rotation.z) , 0 , 0 ,
-		0 , 0 , 1 , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	Quaternion rotaQ;
+
+	//‰ñ“]s—ñ‚ğéŒ¾
+	//Z²‰ñ“]
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 0 , 1.0f} , rotation.z);
+	Matrix4 matRotZ = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//X²‰ñ“]
-	Matrix4 matRotX = {
-		1 , 0 , 0 , 0 ,
-		0 , (float)cos(rotation.x) , (float)sin(rotation.x) , 0 ,
-		0 , (float)-sin(rotation.x) , (float)cos(rotation.x) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({1.0f , 0 , 0} , rotation.x);
+	Matrix4 matRotX = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Y²‰ñ“]
-	Matrix4 matRotY = {
-		(float)cos(rotation.y) , 0 , (float)-sin(rotation.y) , 0 ,
-		0 , 1 , 0 , 0 ,
-		(float)sin(rotation.y) , 0 , (float)cos(rotation.y) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 1.0f , 0} , rotation.y);
+	Matrix4 matRotY = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//s—ñ‚ÌŒvZ
 	matRot *= matRotZ;

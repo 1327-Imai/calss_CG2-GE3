@@ -50,8 +50,8 @@ private:
 	Billboard* billboard_ = nullptr;
 	BillboardY* billboardY_ = nullptr;
 
-	//Vector3 pos;
-	//Vector3 rotation;
+	Vector3 pos;
+	Vector3 rotation;
 
 };
 
