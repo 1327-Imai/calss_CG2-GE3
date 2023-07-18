@@ -168,10 +168,10 @@ void GameScene::Update() {
 		rotation.z += MathFunc::Utility::Deg2Rad(1.0f);
 	}
 
-	//camera_->SetPosition(pos);
+	camera_->SetPosition(pos);
 	camera_->SetRotation(rotation);
 
-	object1_->SetRotation(rotation);
+	//object1_->SetRotation(rotation);
 
 	camera_->Update();
 
