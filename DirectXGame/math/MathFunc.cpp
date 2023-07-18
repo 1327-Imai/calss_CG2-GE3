@@ -19,30 +19,20 @@ void MathFunc::Affine::SetMatScale(Matrix4& affineMat , Vector3 scale) {
 //âÒì]çsóÒÇê›íËÇ∑ÇÈä÷êî
 void MathFunc::Affine::SetMatRotation(Matrix4& affineMat , Vector3 rotation) {
 
+	Quaternion rotaQ;
+
 	//âÒì]çsóÒÇêÈåæ
 	//Zé≤âÒì]
-	Matrix4 matRotZ = {
-		(float)cos(rotation.z) , (float)sin(rotation.z) , 0 , 0 ,
-		(float)-sin(rotation.z) , (float)cos(rotation.z) , 0 , 0 ,
-		0 , 0 , 1 , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 0 , 1.0f} , rotation.z);
+	Matrix4 matRotZ = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Xé≤âÒì]
-	Matrix4 matRotX = {
-		1 , 0 , 0 , 0 ,
-		0 , (float)cos(rotation.x) , (float)sin(rotation.x) , 0 ,
-		0 , -(float)sin(rotation.x) , (float)cos(rotation.x) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({1.0f , 0 , 0} , rotation.x);
+	Matrix4 matRotX = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Yé≤âÒì]
-	Matrix4 matRotY = {
-		(float)cos(rotation.y) , 0 , (float)-sin(rotation.y) , 0 ,
-		0 , 1 , 0 , 0 ,
-		(float)sin(rotation.y) , 0 , (float)cos(rotation.y) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 1.0f , 0} , rotation.y);
+	Matrix4 matRotY = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//çsóÒÇÃåvéZ
 	affineMat *= matRotZ;
@@ -92,28 +82,20 @@ Matrix4 MathFunc::Affine::CreateMatRotation(Vector3 rotation) {
 	matRot.SetIdentityMatrix();
 
 	//Zé≤âÒì]
-	Matrix4 matRotZ = {
-		(float)cos(rotation.z) , (float)sin(rotation.z) , 0 , 0 ,
-		(float)-sin(rotation.z) , (float)cos(rotation.z) , 0 , 0 ,
-		0 , 0 , 1 , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	Quaternion rotaQ;
+
+	//âÒì]çsóÒÇêÈåæ
+	//Zé≤âÒì]
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 0 , 1.0f} , rotation.z);
+	Matrix4 matRotZ = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Xé≤âÒì]
-	Matrix4 matRotX = {
-		1 , 0 , 0 , 0 ,
-		0 , (float)cos(rotation.x) , (float)sin(rotation.x) , 0 ,
-		0 , (float)-sin(rotation.x) , (float)cos(rotation.x) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({1.0f , 0 , 0} , rotation.x);
+	Matrix4 matRotX = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//Yé≤âÒì]
-	Matrix4 matRotY = {
-		(float)cos(rotation.y) , 0 , (float)-sin(rotation.y) , 0 ,
-		0 , 1 , 0 , 0 ,
-		(float)sin(rotation.y) , 0 , (float)cos(rotation.y) , 0 ,
-		0 , 0 , 0 , 1 ,
-	};
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0 , 1.0f , 0} , rotation.y);
+	Matrix4 matRotY = MathFunc::Utility::MakeRotateMatrix(rotaQ);
 
 	//çsóÒÇÃåvéZ
 	matRot *= matRotZ;
@@ -202,6 +184,62 @@ Matrix4 MathFunc::Utility::PerspectiveFovLH(float fovAngleY , float aspectRatio 
 
 
 	return perspectiveFovLH;
+}
+
+Quaternion MathFunc::Utility::MakeAxisAngle(const Vector3& axis , float angle) {
+	Quaternion ans;
+	Vector3 ansV = axis;
+
+	ansV.normalize();
+
+	ansV *= sinf(angle / 2);
+
+	ans = {
+		ansV.x ,
+		ansV.y ,
+		ansV.z ,
+		cosf(angle / 2)
+	};
+
+	return ans;
+
+}
+
+Vector3 MathFunc::Utility::RotateVector(const Vector3& v , const Quaternion& q) {
+	Quaternion ans = q;
+
+	Quaternion pos = {v.x , v.y , v.z , 0};
+	Quaternion rotaQ = q;
+
+	ans = ans.Multiply(pos);
+	ans = ans.Multiply(rotaQ.Conjugate());
+
+	return Vector3(ans.x , ans.y , ans.z);
+
+}
+
+Matrix4 MathFunc::Utility::MakeRotateMatrix(const Quaternion& q) {
+
+	Matrix4 ans;
+	ans.SetIdentityMatrix();
+
+	ans.m[0][0] = powf(q.w , 2) + powf(q.x , 2) - powf(q.y , 2) - powf(q.z , 2);
+	ans.m[0][1] = 2 * (q.x * q.y + q.w * q.z);
+	ans.m[0][2] = 2 * (q.x * q.z - q.w * q.y);
+	ans.m[0][3] = 0;
+
+	ans.m[1][0] = 2 * (q.x * q.y - q.w * q.z);
+	ans.m[1][1] = powf(q.w , 2) - powf(q.x , 2) + powf(q.y , 2) - powf(q.z , 2);
+	ans.m[1][2] = 2 * (q.y * q.z + q.w * q.x);
+	ans.m[1][3] = 0;
+
+	ans.m[2][0] = 2 * (q.x * q.z + q.w * q.y);
+	ans.m[2][1] = 2 * (q.y * q.z - q.w * q.x);
+	ans.m[2][2] = powf(q.w , 2) - powf(q.x , 2) - powf(q.y , 2) + powf(q.z , 2);
+	ans.m[2][3] = 0;
+
+	return ans;
+
 }
 
 double MathFunc::Ease::In(double start , double end , double time , double max_time)

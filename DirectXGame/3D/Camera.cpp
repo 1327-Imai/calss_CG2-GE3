@@ -33,27 +33,23 @@ void Camera::Update() {
 		worldTransform_.matWorld_.m[3][2]
 	};
 
-	up_ = {
-		0,
-		worldTransform_.matWorld_.m[1][1] ,
-		0
-	};
 
-	up_.normalize();
+	up_ = {0 , 1.0f , 0};
+	target_ = {0 , 0 , 1.0f};
 
-	if (targetPos_) {
-		target_ = *targetPos_;
-	}
-	else {
-		target_ = {
-			worldTransform_.matWorld_.m[2][0] ,
-			worldTransform_.matWorld_.m[1][2] ,
-			worldTransform_.matWorld_.m[2][2]
-		};
+	Quaternion rotation = MathFunc::Utility::MakeAxisAngle({0.0f , 0.0f , 1.0f} , worldTransform_.rotation_.z);
+	up_ = MathFunc::Utility::RotateVector(up_ , rotation);
+	target_ = MathFunc::Utility::RotateVector(target_ , rotation);
 
-		target_.normalize();
-		target_ += eye_;
-	}
+	rotation = MathFunc::Utility::MakeAxisAngle({1.0f , 0.0f , 0.0f} , worldTransform_.rotation_.x);
+	up_ = MathFunc::Utility::RotateVector(up_ , rotation);
+	target_ = MathFunc::Utility::RotateVector(target_ , rotation);
+
+	rotation = MathFunc::Utility::MakeAxisAngle({0.0f , 1.0f , 0.0f} , worldTransform_.rotation_.y);
+	up_ = MathFunc::Utility::RotateVector(up_ , rotation);
+	target_ = MathFunc::Utility::RotateVector(target_ , rotation);
+
+	target_ += eye_;
 
 	CreateMatView();
 	CreateMatProjection();

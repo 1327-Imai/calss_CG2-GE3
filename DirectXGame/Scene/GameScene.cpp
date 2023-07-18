@@ -153,10 +153,10 @@ void GameScene::Update() {
 	//}
 
 	if (input_->PushKey(DIK_UP)) {
-		rotation.x += MathFunc::Utility::Deg2Rad(1.0f);
+		rotation.x -= MathFunc::Utility::Deg2Rad(1.0f);
 	}
 	if (input_->PushKey(DIK_DOWN)) {
-		rotation.x -= MathFunc::Utility::Deg2Rad(1.0f);
+		rotation.x += MathFunc::Utility::Deg2Rad(1.0f);
 	}
 	if (input_->PushKey(DIK_LEFT)) {
 		rotation.y -= MathFunc::Utility::Deg2Rad(1.0f);
@@ -168,10 +168,10 @@ void GameScene::Update() {
 		rotation.z += MathFunc::Utility::Deg2Rad(1.0f);
 	}
 
-	camera_->SetPosition(pos);
+	//camera_->SetPosition(pos);
 	camera_->SetRotation(rotation);
 
-	//object1_->SetRotation(rotation);
+	object1_->SetRotation(rotation);
 
 	camera_->Update();
 
