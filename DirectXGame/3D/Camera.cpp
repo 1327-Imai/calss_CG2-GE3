@@ -105,6 +105,8 @@ void Camera::CreateMatProjection(){
 
 void Camera::CreateMatBillboard(){
 
+	const Vector3 worldAxisY = {0 , 1.0f , 0};
+
 	Vector3 cameraAxisZ = target_ - eye_;
 
 	assert(!cameraAxisZ.length() == 0);
@@ -112,7 +114,7 @@ void Camera::CreateMatBillboard(){
 
 	cameraAxisZ.normalize();
 
-	Vector3 cameraAxisX = up_.cross(cameraAxisZ);
+	Vector3 cameraAxisX = worldAxisY.cross(cameraAxisZ);
 	cameraAxisX.normalize();
 
 	Vector3 cameraAxisY = cameraAxisZ.cross(cameraAxisX);
@@ -128,7 +130,7 @@ void Camera::CreateMatBillboard(){
 
 	Vector3 ybillCameraAxisX = cameraAxisX;
 
-	Vector3 ybillCameraAxisY = up_;
+	Vector3 ybillCameraAxisY = worldAxisY;
 	ybillCameraAxisY.normalize();
 
 	Vector3 ybillCameraAxisZ = ybillCameraAxisX.cross(ybillCameraAxisY);
