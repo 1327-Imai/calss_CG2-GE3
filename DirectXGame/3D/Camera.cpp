@@ -16,12 +16,13 @@ void Camera::Initialize() {
 	matBillboardY_.SetIdentityMatrix();
 
 	worldTransform_.initialize();
-	worldTransform_.translation_ = {5 , 5 , -10};
+	worldTransform_.translation_ = {0 , 0 , -10};
 
 	fovY_ = 45.0f;
 	nearZ_ = 0.1f;
 	farZ_ = 1000.0f;
 
+	Update();
 }
 
 void Camera::Update() {

@@ -123,6 +123,8 @@ void GameScene::Update() {
 	//XVˆ—
 	input_->Update();
 
+	pos = {0 , 0 , 0};
+
 	if (input_->PushKey(DIK_D)) {
 		pos.x += 0.1f;
 	}
@@ -130,11 +132,26 @@ void GameScene::Update() {
 		pos.x -= 0.1f;
 	}
 	if (input_->PushKey(DIK_W)) {
-		pos.y += 0.1f;
+		pos.z += 0.1f;
 	}
 	if (input_->PushKey(DIK_S)) {
+		pos.z -= 0.1f;
+	}
+	if (input_->PushKey(DIK_Z)) {
+		pos.y += 0.1f;
+	}
+	if (input_->PushKey(DIK_C)) {
 		pos.y -= 0.1f;
 	}
+
+	Quaternion rotaQ = MathFunc::Utility::MakeAxisAngle({0.0f , 0.0f , 1.0f} , camera_->GetRotation().z);
+	pos = MathFunc::Utility::RotateVector(pos , rotaQ);
+
+	rotaQ = MathFunc::Utility::MakeAxisAngle({1.0f , 0.0f , 0.0f} , camera_->GetRotation().x);
+	pos = MathFunc::Utility::RotateVector(pos , rotaQ);
+
+	rotaQ = MathFunc::Utility::MakeAxisAngle({0.0f , 1.0f , 0.0f} , camera_->GetRotation().y);
+	pos = MathFunc::Utility::RotateVector(pos , rotaQ);
 
 	//if (input_->PushKey(DIK_UP)) {
 	//	rotation.x = object1_->GetRotation().x + MathFunc::Utility::Deg2Rad(1.0f);
@@ -168,7 +185,7 @@ void GameScene::Update() {
 		rotation.z += MathFunc::Utility::Deg2Rad(1.0f);
 	}
 
-	camera_->SetPosition(pos);
+	camera_->SetPosition(camera_->GetPosition() + pos);
 	camera_->SetRotation(rotation);
 
 	//object1_->SetRotation(rotation);
@@ -184,8 +201,6 @@ void GameScene::Update() {
 		sprite_->SetTexture(textureManager_->CallTexture("texture"));
 	}
 
-
-
 	object1_->Update();
 	object2_->Update();
 	object3_->Update();
@@ -195,6 +210,15 @@ void GameScene::Update() {
 	billboard_->Update();
 	billboardY_->Update();
 	sprite_->Update();
+
+	Quaternion r0 = MathFunc::Utility::MakeAxisAngle({0.71f , 0.71f , 0} , 0.3f);
+	Quaternion r1 = MathFunc::Utility::MakeAxisAngle({0.71f , 0 , 0.71f} , MathFunc::PI);
+
+	Quaternion interpolate0 = MathFunc::Utility::Slerp(r0 , r1 , 0.0f);
+	Quaternion interpolate1 = MathFunc::Utility::Slerp(r0 , r1 , 0.3f);
+	Quaternion interpolate2 = MathFunc::Utility::Slerp(r0 , r1 , 0.5f);
+	Quaternion interpolate3 = MathFunc::Utility::Slerp(r0 , r1 , 0.7f);
+	Quaternion interpolate4 = MathFunc::Utility::Slerp(r0 , r1 , 1.0f);
 
 }
 

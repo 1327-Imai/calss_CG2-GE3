@@ -132,3 +132,27 @@ bool Quaternion::operator!=(const Quaternion& q) {
 
 	return true;
 }
+
+const Quaternion& operator+(const Quaternion& q1 , const Quaternion& q2) {
+	Quaternion temp(q1);
+	return temp += q2;
+}
+
+const Quaternion& operator-(const Quaternion& q1 , const Quaternion& q2) {
+	Quaternion temp(q1);
+	return temp -= q2;
+}
+
+const Quaternion& operator*(const Quaternion& q , float s) {
+	Quaternion temp(q);
+	return temp *= s;
+}
+
+const Quaternion& operator*(float s , const Quaternion& q) {
+	return q * s;
+}
+
+const Quaternion& operator/(const Quaternion& q , float s) {
+	Quaternion temp(q);
+	return temp /= s;
+}
