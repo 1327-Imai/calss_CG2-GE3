@@ -242,6 +242,49 @@ Matrix4 MathFunc::Utility::MakeRotateMatrix(const Quaternion& q) {
 
 }
 
+Quaternion MathFunc::Utility::Slerp(const Quaternion& q0 , const Quaternion& q1 , float t) {
+	Quaternion ans;
+
+	Quaternion lQ0 = q0;
+	Quaternion lQ1 = q1;
+
+	lQ0 = lQ0.Normalize();
+	lQ1 = lQ1.Normalize();
+
+	float dot = (lQ0.x * lQ1.x) + (lQ0.y * lQ1.y) + (lQ0.z * lQ1.z) + (lQ0.w * lQ1.w);
+
+	if (dot < 0) {
+		lQ0 = -lQ0;
+		dot = -dot;
+	}
+
+	float theta = acosf(dot);
+
+	ans = Quaternion(sinf((1 - t) * theta) / sinf(theta) * lQ0) +
+		Quaternion(sinf(t * theta) / sinf(theta) * lQ1);
+
+	return ans;
+}
+
+Quaternion MathFunc::Utility::Direction2Direction(const Vector3& u , const Vector3& v) {
+
+	Vector3 lU = u;
+	lU.normalize();
+
+	Vector3 lV = v;
+	lV.normalize();
+
+	float dot = lU.dot(lV);
+
+	Vector3 cross = lU.cross(lV);
+
+	Vector3 axis = cross.normalize();
+
+	float theta = acosf(dot);
+
+	return MakeAxisAngle(axis , theta);
+}
+
 double MathFunc::Ease::In(double start , double end , double time , double max_time)
 {
 	time /= max_time;

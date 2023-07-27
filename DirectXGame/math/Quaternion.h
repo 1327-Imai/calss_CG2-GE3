@@ -50,3 +50,10 @@ public:
 
 };
 
+//3項演算子オーバーロード
+//いろんな引数(引数の型と順序)のパターンに対応するために、以下のように準備している
+const Quaternion& operator+(const Quaternion& q1 , const Quaternion& q2);
+const Quaternion& operator-(const Quaternion& q1 , const Quaternion& q2);
+const Quaternion& operator*(const Quaternion& q , float s);
+const Quaternion& operator*(float s , const Quaternion& q);
+const Quaternion& operator/(const Quaternion& v , float s);

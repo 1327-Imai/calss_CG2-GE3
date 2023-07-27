@@ -10,6 +10,7 @@ public:
 	Vector3& normalize();
 	float dot(const Vector3& v) const;
 	Vector3 cross(const Vector3& v) const;
+	const Vector3 lerp(const Vector3& start , const Vector3& end , const float t);
 
 	//単項演算子オーバーロード
 	Vector3 operator+() const;
