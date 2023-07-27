@@ -211,15 +211,6 @@ void GameScene::Update() {
 	billboardY_->Update();
 	sprite_->Update();
 
-	Quaternion r0 = MathFunc::Utility::MakeAxisAngle({0.71f , 0.71f , 0} , 0.3f);
-	Quaternion r1 = MathFunc::Utility::MakeAxisAngle({0.71f , 0 , 0.71f} , MathFunc::PI);
-
-	Quaternion interpolate0 = MathFunc::Utility::Slerp(r0 , r1 , 0.0f);
-	Quaternion interpolate1 = MathFunc::Utility::Slerp(r0 , r1 , 0.3f);
-	Quaternion interpolate2 = MathFunc::Utility::Slerp(r0 , r1 , 0.5f);
-	Quaternion interpolate3 = MathFunc::Utility::Slerp(r0 , r1 , 0.7f);
-	Quaternion interpolate4 = MathFunc::Utility::Slerp(r0 , r1 , 1.0f);
-
 }
 
 //ï`âÊèàóù
