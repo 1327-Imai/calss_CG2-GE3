@@ -64,6 +64,12 @@
     <Filter Include="shader\Obj">
       <UniqueIdentifier>{d05b60be-f3f3-4468-8a5d-07958f5cfcc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader\Billborad">
+      <UniqueIdentifier>{102a0936-0981-4582-b816-5c6cdc3e1381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader\Particle">
+      <UniqueIdentifier>{035e7e66-23c0-4a9f-b5a6-415982394dc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math\MathFunc.cpp">
@@ -132,6 +138,9 @@
     <ClCompile Include="math\Quaternion.cpp">
       <Filter>source\math</Filter>
     </ClCompile>
+    <ClCompile Include="3D\ParticleManager.cpp">
+      <Filter>source\3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\MathFunc.h">
@@ -197,6 +206,9 @@
     <ClInclude Include="math\Quaternion.h">
       <Filter>header\Math</Filter>
     </ClInclude>
+    <ClInclude Include="3D\ParticleManager.h">
+      <Filter>header\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shader\Basic\Basic.hlsli">
@@ -207,6 +219,12 @@
     </None>
     <None Include="Resources\shader\Obj\Obj.hlsli">
       <Filter>shader\Obj</Filter>
+    </None>
+    <None Include="Resources\shader\Billboard\Billboard.hlsli">
+      <Filter>shader\Billborad</Filter>
+    </None>
+    <None Include="Resources\shader\Particle\Particle.hlsli">
+      <Filter>shader\Particle</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +245,24 @@
     </FxCompile>
     <FxCompile Include="Resources\shader\Obj\ObjVS.hlsl">
       <Filter>shader\Obj</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Basic\BasicGS.hlsl">
+      <Filter>shader\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Billboard\BillboardPS.hlsl">
+      <Filter>shader\Billborad</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Billboard\BillboardVS.hlsl">
+      <Filter>shader\Billborad</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Particle\ParticleGS.hlsl">
+      <Filter>shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Particle\ParticlePS.hlsl">
+      <Filter>shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Particle\ParticleVS.hlsl">
+      <Filter>shader\Particle</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

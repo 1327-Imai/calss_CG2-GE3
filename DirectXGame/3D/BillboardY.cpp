@@ -39,7 +39,7 @@ void BillboardY::CreateGraphicsPipeline() {
 
 	// 頂点シェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shader/Basic/BasicVS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Billboard/BillboardVS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -68,7 +68,7 @@ void BillboardY::CreateGraphicsPipeline() {
 
 	//ピクセルシェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shader/Basic/BasicPS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Billboard/BillboardPS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -108,7 +108,7 @@ void BillboardY::CreateGraphicsPipeline() {
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
 		{//uv座標
-			"TEXCODE" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
+			"TEXCOORD" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
@@ -348,7 +348,7 @@ void BillboardY::Initialize() {
 
 void BillboardY::Update() {
 
-	worldTransform_.UpdateMatWorld(camera_->GetMatBillBoardY());
+	worldTransform_.UpdateMatWorld(camera_->GetMatBillboardY());
 
 	UpdateConstBufferTransform();
 
