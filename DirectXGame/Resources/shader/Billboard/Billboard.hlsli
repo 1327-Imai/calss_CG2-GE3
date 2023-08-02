@@ -25,14 +25,3 @@ struct VSOutput {
 	float2 uv : TEXCOORD;
 
 };
-
-//ジオメトリシェーダーの出力構造体
-//(ジオメトリシェーダーからピクセルシェーダーへのやり取りに使用する)
-struct GSOutput {
-
-	//システム用頂点座標
-	float4 svpos : SV_POSITION;
-	//uv値
-	float2 uv : TEXCOORD;
-
-};

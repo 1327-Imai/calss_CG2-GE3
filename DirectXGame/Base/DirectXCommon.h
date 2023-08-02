@@ -139,7 +139,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 
 	//クリアカラー
-	FLOAT clearColor_[4] = {0.1f , 0.25f , 0.5f , 0.0f};;
+	FLOAT clearColor_[4] = {0.1f , 0.25f , 0.5f , 0.0f};
 
 	//ビューポート
 	D3D12_VIEWPORT viewport_{};

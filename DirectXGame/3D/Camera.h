@@ -37,11 +37,11 @@ public:
 		return matProjection_;
 	}
 
-	Matrix4 GetMatBillBoard() {
+	Matrix4 GetMatBillboard() {
 		return matBillboard_;
 	}
 
-	Matrix4 GetMatBillBoardY() {
+	Matrix4 GetMatBillboardY() {
 		return matBillboardY_;
 	}
 

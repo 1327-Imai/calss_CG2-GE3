@@ -10,6 +10,7 @@ cbuffer ConstBufferDataMaterial : register(b0) {
 cbuffer ConstBufferDataTransform : register(b1) {
 
 	matrix mat;
+	matrix matBillboard;
 
 };
 
@@ -18,11 +19,9 @@ cbuffer ConstBufferDataTransform : register(b1) {
 struct VSOutput {
 
 	//システム用頂点座標
-	float4 svpos : SV_POSITION;
-	//法線ベクトル
-	float3 normal : NORMAL;
-	//uv値
-	float2 uv : TEXCOORD;
+	float4 pos : POSITION;
+	//スケーリング
+	float scale : SCALE;
 
 };
 

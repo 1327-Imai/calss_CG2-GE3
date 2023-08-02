@@ -1,26 +1,21 @@
-#include "Billboard.h"
+#include "ParticleManager.h"
 
-ID3D12Device* Billboard::device_ = nullptr;
-ID3D12GraphicsCommandList* Billboard::cmdList_ = nullptr;
-ComPtr<ID3D12RootSignature> Billboard::rootSignature_;
-ComPtr<ID3D12PipelineState> Billboard::pipelineState_;
-ComPtr<ID3D12Resource> Billboard::vertBuff;
-D3D12_VERTEX_BUFFER_VIEW Billboard::vbView;
-Billboard::VertexPosNormalUv Billboard::vertices[vertexCount_];
-uint16_t Billboard::indices[indexCount_];
-ComPtr<ID3D12Resource> Billboard::indexBuff;
-D3D12_INDEX_BUFFER_VIEW Billboard::ibView;
-D3D12_RESOURCE_DESC Billboard::resDesc;
-Camera* Billboard::camera_ = nullptr;
+ID3D12Device* ParticleManager::device_ = nullptr;
+ID3D12GraphicsCommandList* ParticleManager::cmdList_ = nullptr;
+ComPtr<ID3D12RootSignature> ParticleManager::rootSignature_;
+ComPtr<ID3D12PipelineState> ParticleManager::pipelineState_;
+ComPtr<ID3D12Resource> ParticleManager::vertBuff;
+D3D12_VERTEX_BUFFER_VIEW ParticleManager::vbView;
+D3D12_RESOURCE_DESC ParticleManager::resDesc;
+Camera* ParticleManager::camera_ = nullptr;
 
-
-Billboard::Billboard() {
+ParticleManager::ParticleManager() {
 }
 
-Billboard::~Billboard() {
+ParticleManager::~ParticleManager() {
 }
 
-void Billboard::StaticInitialize(DirectXCommon* dxCommon , Camera* camera){
+void ParticleManager::StaticInitialize(DirectXCommon* dxCommon , Camera* camera) {
 	SetDevice(dxCommon->GetDevice());
 	SetCmdList(dxCommon->GetCmdList());
 	SetCamera(camera);
@@ -28,18 +23,18 @@ void Billboard::StaticInitialize(DirectXCommon* dxCommon , Camera* camera){
 	CreateGraphicsPipeline();
 }
 
-void Billboard::CreateGraphicsPipeline() {
+void ParticleManager::CreateGraphicsPipeline() {
 
 	HRESULT result;
 
-	//頂点シェーダーファイルの読み込みとコンパイル
 	ID3DBlob* vsBlob = nullptr;		//頂点シェーダーオブジェクト
+	ID3DBlob* gsBlob = nullptr;		//ジオメトリシェーダーオブジェクト
 	ID3DBlob* psBlob = nullptr;		//ピクセルシェーダーオブジェクト
 	ID3DBlob* errorBlob = nullptr;	//エラーオブジェクト
 
-	// 頂点シェーダーの読み込みとコンパイル
+	//頂点シェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shader/Billboard/BillboardVS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Particle/ParticleVS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -66,9 +61,38 @@ void Billboard::CreateGraphicsPipeline() {
 		assert(0);
 	}
 
+	// ジオメトリシェーダーの読み込みとコンパイル
+	result = D3DCompileFromFile(
+		L"Resources/Shader/Particle/ParticleGS.hlsl" ,		//シェーダーファイル名
+		nullptr ,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
+		"main" ,											//エントリーポイント名
+		"gs_5_0" ,											//シェーダーモデル指定
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION ,	//デバッグ用設定
+		0 ,
+		&gsBlob ,
+		&errorBlob
+	);
+
+	//シェーダーコードのエラー
+	//エラーなら
+	if (FAILED(result)) {
+		// errorBlobからエラー内容をstring型にコピー
+		std::string error;
+		error.resize(errorBlob->GetBufferSize());
+
+		std::copy_n((char*)errorBlob->GetBufferPointer() ,
+					errorBlob->GetBufferSize() ,
+					error.begin());
+		error += "\n";
+		// エラー内容を出力ウィンドウに表示
+		OutputDebugStringA(error.c_str());
+		assert(0);
+	}
+
 	//ピクセルシェーダーの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shader/Billboard/BillboardPS.hlsl" ,			//シェーダーファイル名
+		L"Resources/Shader/Particle/ParticlePS.hlsl" ,			//シェーダーファイル名
 		nullptr ,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE ,					//インクルード可能にする
 		"main" ,											//エントリーポイント名
@@ -102,13 +126,8 @@ void Billboard::CreateGraphicsPipeline() {
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
-		{//法線ベクトル
-			"NORMAL" , 0 , DXGI_FORMAT_R32G32B32_FLOAT , 0 ,
-			D3D12_APPEND_ALIGNED_ELEMENT ,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
-		} ,
-		{//uv座標
-			"TEXCOORD" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
+		{//スケール
+			"SCALE" , 0 , DXGI_FORMAT_R32G32_FLOAT , 0 ,
 			D3D12_APPEND_ALIGNED_ELEMENT ,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0
 		} ,
@@ -119,6 +138,8 @@ void Billboard::CreateGraphicsPipeline() {
 	//シェーダーの設定
 	pipelineDesc.VS.pShaderBytecode = vsBlob->GetBufferPointer();
 	pipelineDesc.VS.BytecodeLength = vsBlob->GetBufferSize();
+	pipelineDesc.GS.pShaderBytecode = gsBlob->GetBufferPointer();
+	pipelineDesc.GS.BytecodeLength = gsBlob->GetBufferSize();
 	pipelineDesc.PS.pShaderBytecode = psBlob->GetBufferPointer();
 	pipelineDesc.PS.BytecodeLength = psBlob->GetBufferSize();
 
@@ -140,7 +161,7 @@ void Billboard::CreateGraphicsPipeline() {
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	//共通設定(アルファ値)
-	blenddesc.BlendEnable = false;					//ブレンドを有効にする
+	blenddesc.BlendEnable = true;					//ブレンドを有効にする
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソースの値を100%使う
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デストの値を  0%使う
@@ -155,11 +176,11 @@ void Billboard::CreateGraphicsPipeline() {
 	pipelineDesc.InputLayout.NumElements = _countof(inputLayout);
 
 	//図形の形状設定
-	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	//デプスステンシルステートの設定
 	pipelineDesc.DepthStencilState.DepthEnable = true;								//深度テストを行う
-	pipelineDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;		//書き込み許可
+	pipelineDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;	//書き込み禁止
 	pipelineDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;			//小さければ合格
 	pipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;									//深度値フォーマット
 
@@ -238,34 +259,11 @@ void Billboard::CreateGraphicsPipeline() {
 
 }
 
-void Billboard::CreateModel(){
+void ParticleManager::CreateModel() {
 	HRESULT result;
 
-	//四角形の頂点データ
-	VertexPosNormalUv verticesSquare[]{
-		{{-1.0f , -1.0f , 0.0f}, {0 , 0 , 1}, {0 , 1}} ,
-		{{-1.0f , +1.0f , 0.0f}, {0 , 0 , 1}, {0 , 0}} ,
-		{{+1.0f , -1.0f , 0.0f}, {0 , 0 , 1}, {1 , 1}} ,
-		{{+1.0f , +1.0f , 0.0f}, {0 , 0 , 1}, {1 , 0}}
-	};
-
-	//メンバ変数にコピー
-	std::copy(std::begin(verticesSquare) , std::end(verticesSquare) , vertices);
-
-	//四角形にインデックスデータ
-	uint16_t indicesSquare[] {
-		0 , 1 , 2 ,	
-		2 , 1 , 3	
-	};
-
-	//メンバ変数にコピー
-	std::copy(std::begin(indicesSquare) , std::end(indicesSquare) , indices);
-
 	//頂点データ全体のサイズ = 頂点データ一つ分のサイズ * 頂点データの要素数
-	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * vertexCount_);
-
-	//インデックスデータ全体のサイズ
-	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t) * indexCount_);
+	UINT sizeVB = static_cast<UINT>(sizeof(VertexPos) * vertexCount_);
 
 	//頂点バッファの設定
 	D3D12_HEAP_PROPERTIES heapProp{};		//ヒープ設定
@@ -291,76 +289,76 @@ void Billboard::CreateModel(){
 	);
 	assert(SUCCEEDED(result));
 
-	//インデックスバッファの生成
-	result = device_->CreateCommittedResource(
-		&heapProp ,	//ヒープ設定
-		D3D12_HEAP_FLAG_NONE ,
-		&resDesc ,	//リソース設定
-		D3D12_RESOURCE_STATE_GENERIC_READ ,
-		nullptr ,
-		IID_PPV_ARGS(&indexBuff)
-	);
-	assert(SUCCEEDED(result));
-
-	//GPU上のバッファに対応した仮想メモリ(メインメモリ上)を取得
-	VertexPosNormalUv* vertMap = nullptr;
-	result = vertBuff->Map(0 , nullptr , (void**)&vertMap);
-	//全頂点に対して
-	for (int i = 0; i < vertexCount_; i++) {
-		vertMap[i] = vertices[i];	//座標をコピー
-	}
-	//繋がりを解除
-	vertBuff->Unmap(0 , nullptr);
-
-	//インデックスバッファをマッピング
-	uint16_t* indexMap = nullptr;
-	result = indexBuff->Map(0 , nullptr , (void**)&indexMap);
-	//全インデックスに対して
-	for (int i = 0; i < indexCount_; i++) {
-		indexMap[i] = indices[i];	//座標をコピー
-	}
-	//繋がりを解除
-	indexBuff->Unmap(0 , nullptr);
-
 	//頂点バッファビューの作成
 	//GPU仮想アドレス
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
 	//頂点バッファのサイズ
 	vbView.SizeInBytes = sizeVB;
 	//頂点１つ分のデータサイズ
-	vbView.StrideInBytes = sizeof(vertices[0]);
-
-	//インデックスバッファビューの作成
-	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R16_UINT;
-	ibView.SizeInBytes = sizeIB;
+	vbView.StrideInBytes = sizeof(VertexPos);
 
 }
 
-void Billboard::Initialize() {
+void ParticleManager::Initialize() {
 
 	CreateConstBufferTransform();
 	CreateConstBufferMaterial();
 
-	worldTransform_.initialize();
-
 }
 
-void Billboard::Update() {
+void ParticleManager::Update() {
 
-	worldTransform_.UpdateMatWorld(camera_->GetMatBillboard());
+	for (std::forward_list<Particle>::iterator it = particles.begin(); it != particles.end(); it++) {
+
+		it->flame++;
+		it->velocity += it->accel;
+		it->pos += it->velocity;
+
+		float f = (float)it->flame / (float)it->eFlame;
+		it->scale = (it->eScale - it->sScale) * f;
+		it->scale += it->sScale;
+
+	}
+
+	particles.remove_if(
+		[](Particle& x) {
+			return x.flame >= x.eFlame;
+		}
+	);
+
+	//GPU上のバッファに対応した仮想メモリ(メインメモリ上)を取得
+	HRESULT result;
+
+	VertexPos* vertMap = nullptr;
+	result = vertBuff->Map(0 , nullptr , (void**)&vertMap);
+	if (SUCCEEDED(result)) {
+		//全頂点に対して
+		int particleCount = 0;
+		for (std::forward_list<Particle>::iterator it = particles.begin(); it != particles.end(); it++) {
+			if (vertexCount_ < particleCount) {
+				break;
+			}
+
+			vertMap->pos = it->pos;	//座標をコピー
+			vertMap->scale = it->scale;
+			vertMap++;
+			particleCount++;
+		}
+		//繋がりを解除
+		vertBuff->Unmap(0 , nullptr);
+	}
 
 	UpdateConstBufferTransform();
 
 }
 
-void Billboard::Draw() {
+void ParticleManager::Draw() {
 	//パイプラインステートの設定
 	cmdList_->SetPipelineState(pipelineState_.Get());
 	//ルートシグネチャの設定
 	cmdList_->SetGraphicsRootSignature(rootSignature_.Get());
 	//プリミティブ形状を設定
-	cmdList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmdList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 	//定数バッファビュー(CBV)の設定コマンド
 	cmdList_->SetGraphicsRootConstantBufferView(0 , constBufferMaterial_->GetGPUVirtualAddress());
 	cmdList_->SetGraphicsRootConstantBufferView(2 , constBufferTransform_->GetGPUVirtualAddress());
@@ -372,19 +370,32 @@ void Billboard::Draw() {
 
 	//頂点バッファの設定
 	cmdList_->IASetVertexBuffers(0 , 1 , &vbView);
-	//インデックスバッファの設定
-	cmdList_->IASetIndexBuffer(&ibView);
 	//描画コマンド
-	cmdList_->DrawIndexedInstanced(indexCount_ , 1 , 0 , 0 , 0);
+	cmdList_->DrawInstanced((UINT)std::distance(particles.begin() , particles.end()) , 1 , 0 , 0);
 
 }
 
-void Billboard::SetTexture(Texture* texture) {
+void ParticleManager::SetTexture(Texture* texture) {
 	texture_ = texture;
 	texture_->SetSRV(srvHeap_ , srvHandle_ , resDesc);
 }
 
-void Billboard::CreateConstBufferTransform() {
+void ParticleManager::Add(int life , Vector3 position , Vector3 velocity , Vector3 accel , float startSclae , float endScale) {
+
+	//リストに要素を追加
+	particles.emplace_front();
+	Particle& p = particles.front();
+	//値のセット
+	p.pos = position;
+	p.velocity = velocity;
+	p.accel = accel;
+	p.eFlame = life;
+	p.sScale = startSclae;
+	p.eScale = endScale;
+
+}
+
+void ParticleManager::CreateConstBufferTransform() {
 	HRESULT result;
 
 	//定数バッファの生成
@@ -415,7 +426,7 @@ void Billboard::CreateConstBufferTransform() {
 
 }
 
-void Billboard::CreateConstBufferMaterial() {
+void ParticleManager::CreateConstBufferMaterial() {
 	HRESULT result;
 
 	//定数バッファの生成
@@ -454,7 +465,7 @@ void Billboard::CreateConstBufferMaterial() {
 	constMapMaterial->color = {1.0f , 1.0f , 1.0f , 0.5f};
 }
 
-void Billboard::UpdateConstBufferTransform() {
+void ParticleManager::UpdateConstBufferTransform() {
 	HRESULT result;
 	//定数バッファへデータ転送
 	ConstBufferDataTransform* constMap = nullptr;
@@ -463,9 +474,9 @@ void Billboard::UpdateConstBufferTransform() {
 	if (SUCCEEDED(result)) {
 
 		//定数バッファへデータ転送
-		constMap->mat = worldTransform_.matWorld_;
-		constMap->mat *= camera_->GetMatView();
+		constMap->mat = camera_->GetMatView();
 		constMap->mat *= camera_->GetMatProjection();
+		constMap->matBillboard = camera_->GetMatBillboard();
 		constBufferTransform_->Unmap(0 , nullptr);
 	}
 
